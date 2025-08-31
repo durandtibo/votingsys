@@ -103,8 +103,8 @@ def publish_doc_dev(c: Context) -> None:
 @task
 def publish_doc_latest(c: Context) -> None:
     r"""Publish latest (e.g. stable) docs."""
-    from feu.git import get_last_version_tag_name
-    from packaging.version import Version
+    from feu.git import get_last_version_tag_name  # noqa: PLC0415
+    from packaging.version import Version  # noqa: PLC0415
 
     try:
         version = Version(get_last_version_tag_name())
