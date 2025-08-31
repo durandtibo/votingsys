@@ -38,7 +38,7 @@ jobs:
           inv install --all-deps
 
       - name: Install valid package version
-        uses: durandtibo/pip-install-package-action@v0.3.3
+        uses: durandtibo/pip-install-package-action@v0.3.4
         with:
           package-name: 'coola'
           package-version: ${{ matrix.coola-version }}
@@ -87,7 +87,7 @@ jobs:
           inv install --all-deps
 
       - name: Install valid package version
-        uses: durandtibo/pip-install-package-action@v0.3.3
+        uses: durandtibo/pip-install-package-action@v0.3.4
         with:
           package-name: 'polars'
           package-version: ${{ matrix.polars-version }}
