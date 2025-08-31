@@ -54,3 +54,14 @@
 </p>
 
 A python library for preference (or ranked) voting
+
+## Data representation
+
+- can have null values
+- can have the same ranking
+
+### DataFrame with the rank for each candidate
+
+### DataFrame with the score for each candidate
+
+- descending vs ascending
