@@ -17,6 +17,22 @@ def test_single_mark_vote_str() -> None:
     assert str(SingleMarkVote(Counter())).startswith("SingleMarkVote(")
 
 
+def test_single_mark_vote_equal_true() -> None:
+    assert SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3})).equal(
+        SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
+    )
+
+
+def test_single_mark_vote_equal_false_different_counter() -> None:
+    assert not SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3})).equal(
+        SingleMarkVote(Counter())
+    )
+
+
+def test_single_mark_vote_equal_false_different_type() -> None:
+    assert not SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3})).equal(1)
+
+
 def test_single_mark_vote_get_num_candidates() -> None:
     assert SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3})).get_num_candidates() == 4
 

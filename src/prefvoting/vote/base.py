@@ -5,10 +5,40 @@ from __future__ import annotations
 __all__ = ["BaseVote"]
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class BaseVote(ABC):
     r"""Define the base class to implement a vote."""
+
+    @abstractmethod
+    def equal(self, other: Any, equal_nan: bool = False) -> bool:
+        r"""Indicate if two vote objects are equal or not.
+
+        Args:
+            other: The other object to compare.
+            equal_nan: Whether to compare NaN's as equal. If ``True``,
+                NaN's in both objects will be considered equal.
+
+        Returns:
+            ``True`` if the two votes are equal, otherwise ``False``.
+
+        Example usage:
+
+        ```pycon
+
+        >>> from collections import Counter
+        >>> from prefvoting.vote import SingleMarkVote
+        >>> obj1 = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
+        >>> obj2 = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
+        >>> obj3 = SingleMarkVote(Counter({"a": 10, "b": 2}))
+        >>> obj1.equal(obj2)
+        True
+        >>> obj1.equal(obj3)
+        False
+
+        ```
+        """
 
     @abstractmethod
     def get_num_candidates(self) -> int:
