@@ -2,11 +2,18 @@ from __future__ import annotations
 
 from collections import Counter
 
+import pytest
+
 from prefvoting.vote import SingleMarkVote
 
 ####################################
 #     Tests for SingleMarkVote     #
 ####################################
+
+
+def test_single_mark_vote_negative_count() -> None:
+    with pytest.raises(ValueError, match="The count for 'b' is negative: -2"):
+        SingleMarkVote(Counter({"a": 0, "b": -2, "c": 5, "d": 3}))
 
 
 def test_single_mark_vote_repr() -> None:

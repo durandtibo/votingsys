@@ -46,6 +46,18 @@ class BaseVote(ABC):
 
         Returns:
             The number of candidates.
+
+        Example usage:
+
+        ```pycon
+
+        >>> from collections import Counter
+        >>> from prefvoting.vote import SingleMarkVote
+        >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
+        >>> vote.get_num_candidates()
+        4
+
+        ```
         """
 
     @abstractmethod
@@ -54,4 +66,16 @@ class BaseVote(ABC):
 
         Returns:
             The number of voters.
+
+        Example usage:
+
+        ```pycon
+
+        >>> from collections import Counter
+        >>> from prefvoting.vote import SingleMarkVote
+        >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
+        >>> vote.get_num_voters()
+        20
+
+        ```
         """

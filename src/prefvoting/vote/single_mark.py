@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any
 from coola import objects_are_equal
 from coola.utils.format import repr_indent, repr_mapping
 
+from prefvoting.utils.counter import check_non_negative_count
 from prefvoting.vote.base import BaseVote
 
 if TYPE_CHECKING:
@@ -38,8 +39,8 @@ class SingleMarkVote(BaseVote):
     """
 
     def __init__(self, counter: Counter) -> None:
+        check_non_negative_count(counter)
         self._counter = counter
-        # TODO: check positive count
 
     def __repr__(self) -> str:
         args = repr_indent(repr_mapping({"counter": self._counter}))
