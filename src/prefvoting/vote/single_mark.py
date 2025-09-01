@@ -4,7 +4,7 @@ from __future__ import annotations
 
 __all__ = ["SingleMarkVote"]
 
-
+from collections import Counter
 from typing import TYPE_CHECKING, Any
 
 from coola import objects_are_equal
@@ -18,7 +18,9 @@ from prefvoting.vote.base import (
 )
 
 if TYPE_CHECKING:
-    from collections import Counter
+    from collections.abc import Sequence
+
+    import polars as pl
 
 
 class SingleMarkVote(BaseVote):
@@ -71,6 +73,9 @@ class SingleMarkVote(BaseVote):
             The winner based on the plurality rule.
 
         Raises:
+            WinnerNotFoundError: if there is no voters.
+            MultipleWinnersFoundError: if the leading candidates are tied.
+
         Example usage:
 
         ```pycon
@@ -83,10 +88,6 @@ class SingleMarkVote(BaseVote):
 
         ```
         """
-        if not self.get_num_voters():
-            msg = "No winner found because there is no voters"
-            raise WinnerNotFoundError(msg)
-
         winners = self.plurality_winners()
         if len(winners) > 1:
             msg = f"Multiple winners found: {winners}"
@@ -94,8 +95,83 @@ class SingleMarkVote(BaseVote):
         return winners[0]
 
     def plurality_winners(self) -> tuple[str, ...]:
+        r"""Compute the winner based on the plurality rule.
+
+        This rule is also named First-Past-The-Post (FPTP).
+        The leading candidate, whether or not they have a majority of votes, is the winner.
+
+        Returns:
+            The winners based on the plurality rule. Multiple winners
+                can be returned if the leading candidates are tied.
+
+        Example usage:
+
+        ```pycon
+
+        >>> from collections import Counter
+        >>> from prefvoting.vote import SingleMarkVote
+        >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
+        >>> vote.plurality_winners()
+        ('a',)
+
+        ```
+        """
         if not self.get_num_voters():
-            return ()
+            msg = "No winner found because there is no voters"
+            raise WinnerNotFoundError(msg)
         max_count = max(self._counter.values())
         max_candidates = [cand for cand, count in self._counter.items() if count == max_count]
         return tuple(sorted(max_candidates))
+
+    @classmethod
+    def from_sequence(cls, votes: Sequence[str]) -> SingleMarkVote:
+        r"""Instantiate a ``SingleMarkVote`` object from the sequence of
+        votes.
+
+        Args:
+            votes: The sequence of votes.
+
+        Returns:
+            The instantiated ``SingleMarkVote``.
+
+        Example usage:
+
+        ```pycon
+
+        >>> from prefvoting.vote import SingleMarkVote
+        >>> vote = SingleMarkVote.from_sequence(["a", "b", "a", "c", "a", "a", "b"])
+        >>> vote
+        SingleMarkVote(
+          (counter): Counter({'a': 4, 'b': 2, 'c': 1})
+        )
+
+        ```
+        """
+        return cls(Counter(votes))
+
+    @classmethod
+    def from_series(cls, votes: pl.Series) -> SingleMarkVote:
+        r"""Instantiate a ``SingleMarkVote`` object from a
+        ``polars.Series`` containing the votes.
+
+        Args:
+            votes: The ``polars.Series`` containing the votes.
+
+        Returns:
+            The instantiated ``SingleMarkVote``.
+
+        Example usage:
+
+        ```pycon
+
+        >>> import polars as pl
+        >>> from prefvoting.vote import SingleMarkVote
+        >>> vote = SingleMarkVote.from_sequence(pl.Series(["a", "b", "a", "c", "a", "a", "b"]))
+        >>> vote
+        SingleMarkVote(
+          (counter): Counter({'a': 4, 'b': 2, 'c': 1})
+        )
+
+        ```
+        """
+        return cls.from_sequence(votes.to_list())
