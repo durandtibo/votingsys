@@ -4,7 +4,11 @@ from collections import Counter
 
 import pytest
 
-from prefvoting.vote import SingleMarkVote
+from prefvoting.vote import (
+    MultipleWinnersFoundError,
+    SingleMarkVote,
+    WinnerNotFoundError,
+)
 
 ####################################
 #     Tests for SingleMarkVote     #
@@ -54,3 +58,41 @@ def test_single_mark_vote_get_num_votes() -> None:
 
 def test_single_mark_vote_get_num_voters_empty() -> None:
     assert SingleMarkVote(Counter()).get_num_voters() == 0
+
+
+def test_single_mark_vote_plurality_winner() -> None:
+    assert SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3})).plurality_winner() == "a"
+
+
+def test_single_mark_vote_plurality_winner_tie() -> None:
+    vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3, "e": 10}))
+    with pytest.raises(MultipleWinnersFoundError):
+        vote.plurality_winner()
+
+
+def test_single_mark_vote_plurality_winner_1_candidate() -> None:
+    assert SingleMarkVote(Counter({"a": 10})).plurality_winner() == "a"
+
+
+def test_single_mark_vote_plurality_winner_empty() -> None:
+    vote = SingleMarkVote(Counter())
+    with pytest.raises(WinnerNotFoundError, match="No winner found because there is no voters"):
+        vote.plurality_winner()
+
+
+def test_single_mark_vote_plurality_winners() -> None:
+    assert SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3})).plurality_winners() == ("a",)
+
+
+def test_single_mark_vote_plurality_winners_tie() -> None:
+    assert SingleMarkVote(
+        Counter({"a": 10, "b": 2, "c": 5, "d": 3, "e": 10})
+    ).plurality_winners() == ("a", "e")
+
+
+def test_single_mark_vote_plurality_winners_1_candidate() -> None:
+    assert SingleMarkVote(Counter({"a": 10})).plurality_winners() == ("a",)
+
+
+def test_single_mark_vote_plurality_winners_empty() -> None:
+    assert SingleMarkVote(Counter()).plurality_winners() == ()

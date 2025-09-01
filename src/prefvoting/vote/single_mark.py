@@ -11,7 +11,11 @@ from coola import objects_are_equal
 from coola.utils.format import repr_indent, repr_mapping
 
 from prefvoting.utils.counter import check_non_negative_count
-from prefvoting.vote.base import BaseVote
+from prefvoting.vote.base import (
+    BaseVote,
+    MultipleWinnersFoundError,
+    WinnerNotFoundError,
+)
 
 if TYPE_CHECKING:
     from collections import Counter
@@ -60,12 +64,13 @@ class SingleMarkVote(BaseVote):
     def plurality_winner(self) -> str:
         r"""Compute the winner based on the plurality rule.
 
+        This rule is also named First-Past-The-Post (FPTP).
+        The leading candidate, whether or not they have a majority of votes, is the winner.
+
         Returns:
             The winner based on the plurality rule.
 
         Raises:
-
-
         Example usage:
 
         ```pycon
@@ -78,7 +83,19 @@ class SingleMarkVote(BaseVote):
 
         ```
         """
+        if not self.get_num_voters():
+            msg = "No winner found because there is no voters"
+            raise WinnerNotFoundError(msg)
+
+        winners = self.plurality_winners()
+        if len(winners) > 1:
+            msg = f"Multiple winners found: {winners}"
+            raise MultipleWinnersFoundError(msg)
+        return winners[0]
 
     def plurality_winners(self) -> tuple[str, ...]:
-        # sort by alphabetical order if ties
-        pass
+        if not self.get_num_voters():
+            return ()
+        max_count = max(self._counter.values())
+        max_candidates = [cand for cand, count in self._counter.items() if count == max_count]
+        return tuple(sorted(max_candidates))

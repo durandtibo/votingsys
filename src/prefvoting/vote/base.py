@@ -2,7 +2,7 @@ r"""Contain the base class to implement a vote."""
 
 from __future__ import annotations
 
-__all__ = ["BaseVote"]
+__all__ = ["BaseVote", "MultipleWinnersFoundError", "WinnerNotFoundError"]
 
 from abc import ABC, abstractmethod
 from typing import Any
@@ -79,3 +79,11 @@ class BaseVote(ABC):
 
         ```
         """
+
+
+class MultipleWinnersFoundError(Exception):
+    r"""Raised when multiple winners are found instead of one."""
+
+
+class WinnerNotFoundError(Exception):
+    r"""Raised when no winner can be found."""
