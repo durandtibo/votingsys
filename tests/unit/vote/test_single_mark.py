@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import Counter
 
+import polars as pl
 import pytest
 
 from prefvoting.vote import (
@@ -95,4 +96,26 @@ def test_single_mark_vote_plurality_winners_1_candidate() -> None:
 
 
 def test_single_mark_vote_plurality_winners_empty() -> None:
-    assert SingleMarkVote(Counter()).plurality_winners() == ()
+    vote = SingleMarkVote(Counter())
+    with pytest.raises(WinnerNotFoundError, match="No winner found because there is no voters"):
+        vote.plurality_winners()
+
+
+def test_single_mark_vote_from_sequence() -> None:
+    assert SingleMarkVote.from_sequence(["a", "b", "a", "c", "a", "a", "b"]).equal(
+        SingleMarkVote(Counter({"a": 4, "b": 2, "c": 1}))
+    )
+
+
+def test_single_mark_vote_from_sequence_empty() -> None:
+    assert SingleMarkVote.from_sequence([]).equal(SingleMarkVote(Counter()))
+
+
+def test_single_mark_vote_from_series() -> None:
+    assert SingleMarkVote.from_series(pl.Series(["a", "b", "a", "c", "a", "a", "b"])).equal(
+        SingleMarkVote(Counter({"a": 4, "b": 2, "c": 1}))
+    )
+
+
+def test_single_mark_vote_from_series_empty() -> None:
+    assert SingleMarkVote.from_series(pl.Series([])).equal(SingleMarkVote(Counter()))
