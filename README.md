@@ -57,11 +57,30 @@ A python library for preference (or ranked) voting
 
 ## Data representation
 
+- anonymous
 - can have null values
 - can have the same ranking
+
+- Test with a lot of candidates
 
 ### DataFrame with the rank for each candidate
 
 ### DataFrame with the score for each candidate
 
 - descending vs ascending
+
+## Rule
+
+- voter ranks candidates
+- single vs multiple winners: https://en.wikipedia.org/wiki/Comparison_of_voting_rules
+- Ballot type:
+  - single mark
+  - ranking
+  - truncated ranking
+  - ranking with ties
+  - rating
+- approval and score voting: https://en.wikipedia.org/wiki/Approval_voting
+- approve or disapprove of candidates, or decide to express no opinion
+- Score each candidate by filling in a number (0 is worst; 9 is best)
+- Majority Rule: This concept means that the candidate (choice) receiving more than 50%
+of the vote is the winner.
