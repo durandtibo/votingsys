@@ -29,8 +29,8 @@ class SingleMarkVote(BaseVote):
 
     >>> from collections import Counter
     >>> from prefvoting.vote import SingleMarkVote
-    >>> v = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
-    >>> v
+    >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
+    >>> vote
     SingleMarkVote(
       (counter): Counter({'a': 10, 'c': 5, 'd': 3, 'b': 2})
     )
@@ -58,8 +58,27 @@ class SingleMarkVote(BaseVote):
         return self._counter.total()
 
     def plurality_winner(self) -> str:
-        pass
+        r"""Compute the winner based on the plurality rule.
+
+        Returns:
+            The winner based on the plurality rule.
+
+        Raises:
+
+
+        Example usage:
+
+        ```pycon
+
+        >>> from collections import Counter
+        >>> from prefvoting.vote import SingleMarkVote
+        >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
+        >>> vote.plurality_winner()
+        'a'
+
+        ```
+        """
 
     def plurality_winners(self) -> tuple[str, ...]:
-        # sort by aphabetical order if ties
+        # sort by alphabetical order if ties
         pass
