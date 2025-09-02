@@ -5,7 +5,7 @@ from collections import Counter
 import polars as pl
 import pytest
 
-from prefvoting.vote import (
+from votingsys.vote import (
     MultipleWinnersFoundError,
     SingleMarkVote,
     WinnerNotFoundError,

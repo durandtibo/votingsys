@@ -41,7 +41,7 @@ jobs:
           inv unit-test --cov
 
       - name: Upload coverage to Codecov
-        if: github.repository == 'durandtibo/prefvoting' && (github.event_name == 'push' || github.event_name == 'pull_request')
+        if: github.repository == 'durandtibo/votingsys' && (github.event_name == 'push' || github.event_name == 'pull_request')
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

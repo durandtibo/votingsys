@@ -36,10 +36,10 @@ jobs:
         run: |
           inv show-installed-packages
 
-      - name: check prefvoting
+      - name: check votingsys
         run: |
-          python -c "import prefvoting"
+          python -c "import votingsys"
 
-      - name: check prefvoting.utils
+      - name: check votingsys.utils
         run: |
-          python -c "from prefvoting import utils"
+          python -c "from votingsys import utils"

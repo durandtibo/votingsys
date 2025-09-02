@@ -10,8 +10,8 @@ from typing import TYPE_CHECKING, Any
 from coola import objects_are_equal
 from coola.utils.format import repr_indent, repr_mapping
 
-from prefvoting.utils.counter import check_non_empty_count, check_non_negative_count
-from prefvoting.vote.base import (
+from votingsys.utils.counter import check_non_empty_count, check_non_negative_count
+from votingsys.vote.base import (
     BaseVote,
     MultipleWinnersFoundError,
     WinnerNotFoundError,
@@ -40,7 +40,7 @@ class SingleMarkVote(BaseVote):
     ```pycon
 
     >>> from collections import Counter
-    >>> from prefvoting.vote import SingleMarkVote
+    >>> from votingsys.vote import SingleMarkVote
     >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
     >>> vote
     SingleMarkVote(
@@ -86,7 +86,7 @@ class SingleMarkVote(BaseVote):
         ```pycon
 
         >>> from collections import Counter
-        >>> from prefvoting.vote import SingleMarkVote
+        >>> from votingsys.vote import SingleMarkVote
         >>> vote = SingleMarkVote(Counter({"a": 10, "b": 20, "c": 5, "d": 3}))
         >>> vote.absolute_majority_winner()
         'b'
@@ -110,7 +110,6 @@ class SingleMarkVote(BaseVote):
             The winner based on the plurality rule.
 
         Raises:
-            WinnerNotFoundError: if there is no voters.
             MultipleWinnersFoundError: if the leading candidates are tied.
 
         Example usage:
@@ -118,7 +117,7 @@ class SingleMarkVote(BaseVote):
         ```pycon
 
         >>> from collections import Counter
-        >>> from prefvoting.vote import SingleMarkVote
+        >>> from votingsys.vote import SingleMarkVote
         >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
         >>> vote.plurality_winner()
         'a'
@@ -146,7 +145,7 @@ class SingleMarkVote(BaseVote):
         ```pycon
 
         >>> from collections import Counter
-        >>> from prefvoting.vote import SingleMarkVote
+        >>> from votingsys.vote import SingleMarkVote
         >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
         >>> vote.plurality_winners()
         ('a',)
@@ -172,7 +171,7 @@ class SingleMarkVote(BaseVote):
 
         ```pycon
 
-        >>> from prefvoting.vote import SingleMarkVote
+        >>> from votingsys.vote import SingleMarkVote
         >>> vote = SingleMarkVote.from_sequence(["a", "b", "a", "c", "a", "a", "b"])
         >>> vote
         SingleMarkVote(
@@ -199,7 +198,7 @@ class SingleMarkVote(BaseVote):
         ```pycon
 
         >>> import polars as pl
-        >>> from prefvoting.vote import SingleMarkVote
+        >>> from votingsys.vote import SingleMarkVote
         >>> vote = SingleMarkVote.from_sequence(pl.Series(["a", "b", "a", "c", "a", "a", "b"]))
         >>> vote
         SingleMarkVote(

@@ -24,7 +24,7 @@ def check_non_empty_count(counter: Counter) -> None:
     ```pycon
 
     >>> from collections import Counter
-    >>> from prefvoting.utils.counter import check_non_empty_count
+    >>> from votingsys.utils.counter import check_non_empty_count
     >>> check_non_empty_count(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
 
     ```
@@ -48,7 +48,7 @@ def check_non_negative_count(counter: Counter) -> None:
     ```pycon
 
     >>> from collections import Counter
-    >>> from prefvoting.utils.counter import check_non_negative_count
+    >>> from votingsys.utils.counter import check_non_negative_count
     >>> check_non_negative_count(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
 
     ```

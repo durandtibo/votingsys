@@ -30,7 +30,7 @@ def timeblock(message: str = "Total time: {time}") -> Generator[None]:
 
     ```pycon
 
-    >>> from prefvoting.utils.timing import timeblock
+    >>> from votingsys.utils.timing import timeblock
     >>> with timeblock():
     ...     x = [1, 2, 3]
     ...

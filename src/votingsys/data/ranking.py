@@ -27,7 +27,7 @@ def is_valid_linear_ranking(frame_rank: pl.DataFrame) -> bool:
     ```pycon
 
     >>> import polars as pl
-    >>> from prefvoting.data.ranking import is_valid_linear_ranking
+    >>> from votingsys.data.ranking import is_valid_linear_ranking
     >>> is_valid_linear_ranking(
     ...     pl.DataFrame({"a": [0, 1, 2, 1, 0], "b": [1, 2, 0, 2, 1], "c": [2, 0, 1, 0, 2]})
     ... )

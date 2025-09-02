@@ -4,9 +4,9 @@ from __future__ import annotations
 
 __all__ = ["BaseVote", "MultipleWinnersFoundError", "SingleMarkVote", "WinnerNotFoundError"]
 
-from prefvoting.vote.base import (
+from votingsys.vote.base import (
     BaseVote,
     MultipleWinnersFoundError,
     WinnerNotFoundError,
 )
-from prefvoting.vote.single_mark import SingleMarkVote
+from votingsys.vote.single_mark import SingleMarkVote
