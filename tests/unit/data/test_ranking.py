@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import polars as pl
 
-from prefvoting.data.ranking import is_valid_linear_ranking
+from votingsys.data.ranking import is_valid_linear_ranking
 
 #############################################
 #     Tests for is_valid_linear_ranking     #

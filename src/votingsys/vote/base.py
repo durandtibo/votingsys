@@ -28,7 +28,7 @@ class BaseVote(ABC):
         ```pycon
 
         >>> from collections import Counter
-        >>> from prefvoting.vote import SingleMarkVote
+        >>> from votingsys.vote import SingleMarkVote
         >>> obj1 = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
         >>> obj2 = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
         >>> obj3 = SingleMarkVote(Counter({"a": 10, "b": 2}))
@@ -52,7 +52,7 @@ class BaseVote(ABC):
         ```pycon
 
         >>> from collections import Counter
-        >>> from prefvoting.vote import SingleMarkVote
+        >>> from votingsys.vote import SingleMarkVote
         >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
         >>> vote.get_num_candidates()
         4
@@ -72,7 +72,7 @@ class BaseVote(ABC):
         ```pycon
 
         >>> from collections import Counter
-        >>> from prefvoting.vote import SingleMarkVote
+        >>> from votingsys.vote import SingleMarkVote
         >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
         >>> vote.get_num_voters()
         20

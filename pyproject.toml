@@ -1,5 +1,5 @@
 [project]
-name = "prefvoting"
+name = "votingsys"
 version = "0.0.1a0"
 description = "Library for preference (or ranked) voting"
 readme = "README.md"
@@ -63,7 +63,7 @@ source = ["src", "*/site-packages"]
 
 [tool.coverage.run]
 branch = true
-source = ["prefvoting"]
+source = ["votingsys"]
 
 [tool.coverage.report]
 show_missing = true

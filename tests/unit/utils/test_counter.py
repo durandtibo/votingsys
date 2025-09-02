@@ -4,7 +4,7 @@ from collections import Counter
 
 import pytest
 
-from prefvoting.utils.counter import check_non_empty_count, check_non_negative_count
+from votingsys.utils.counter import check_non_empty_count, check_non_negative_count
 
 ###########################################
 #     Tests for check_non_empty_count     #

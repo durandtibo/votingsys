@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from prefvoting.utils.timing import timeblock
+from votingsys.utils.timing import timeblock
 
 ###############################
 #     Tests for timeblock     #
