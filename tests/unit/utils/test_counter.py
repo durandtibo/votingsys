@@ -4,7 +4,21 @@ from collections import Counter
 
 import pytest
 
-from prefvoting.utils.counter import check_non_negative_count
+from prefvoting.utils.counter import check_non_empty_count, check_non_negative_count
+
+###########################################
+#     Tests for check_non_empty_count     #
+###########################################
+
+
+def test_check_non_empty_count_valid() -> None:
+    check_non_empty_count(Counter({"a": 0, "b": 2, "c": 5, "d": 3}))
+
+
+def test_check_non_empty_count_empty() -> None:
+    with pytest.raises(ValueError, match="The counter is empty"):
+        check_non_empty_count(Counter())
+
 
 ##############################################
 #     Tests for check_non_negative_count     #
