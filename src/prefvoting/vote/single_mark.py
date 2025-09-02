@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any
 from coola import objects_are_equal
 from coola.utils.format import repr_indent, repr_mapping
 
-from prefvoting.utils.counter import check_non_negative_count
+from prefvoting.utils.counter import check_non_empty_count, check_non_negative_count
 from prefvoting.vote.base import (
     BaseVote,
     MultipleWinnersFoundError,
@@ -31,6 +31,10 @@ class SingleMarkVote(BaseVote):
     Args:
         counter: The counter with the number of votes for each candidate.
 
+    Raises:
+        ValueError: if at least one count is negative (<0).
+        ValueError: if the counter is empty.
+
     Example usage:
 
     ```pycon
@@ -48,6 +52,7 @@ class SingleMarkVote(BaseVote):
 
     def __init__(self, counter: Counter) -> None:
         check_non_negative_count(counter)
+        check_non_empty_count(counter)
         self._counter = counter
 
     def __repr__(self) -> str:
@@ -122,7 +127,7 @@ class SingleMarkVote(BaseVote):
         """
         winners = self.plurality_winners()
         if len(winners) > 1:
-            msg = f"Multiple winners found: {winners}"
+            msg = f"Multiple winners found using plurality rule: {winners}"
             raise MultipleWinnersFoundError(msg)
         return winners[0]
 
@@ -148,9 +153,6 @@ class SingleMarkVote(BaseVote):
 
         ```
         """
-        if not self.get_num_voters():
-            msg = "No winner found because there is no voters"
-            raise WinnerNotFoundError(msg)
         max_count = max(self._counter.values())
         max_candidates = [cand for cand, count in self._counter.items() if count == max_count]
         return tuple(sorted(max_candidates))
