@@ -26,6 +26,8 @@ if TYPE_CHECKING:
 class SingleMarkVote(BaseVote):
     r"""Define a single-mark vote.
 
+    This vote assumes that the voter must mark one and only one candidate.
+
     Args:
         counter: The counter with the number of votes for each candidate.
 
@@ -62,6 +64,36 @@ class SingleMarkVote(BaseVote):
 
     def get_num_voters(self) -> int:
         return self._counter.total()
+
+    def absolute_majority_winner(self) -> str:
+        r"""Compute the winner based on the absolute majority rule.
+
+        The candidate receiving more than 50% of the vote is the winner.
+
+        Returns:
+            The winner based on the absolute majority rule.
+
+        Raises:
+            WinnerNotFoundError: if no candidate has the majority of votes.
+
+        Example usage:
+
+        ```pycon
+
+        >>> from collections import Counter
+        >>> from prefvoting.vote import SingleMarkVote
+        >>> vote = SingleMarkVote(Counter({"a": 10, "b": 20, "c": 5, "d": 3}))
+        >>> vote.absolute_majority_winner()
+        'b'
+
+        ```
+        """
+        total_votes = self.get_num_voters()
+        candidate, num_votes = self._counter.most_common(1)[0]
+        if num_votes / total_votes > 0.5:
+            return candidate
+        msg = "No winner found using absolute majority rule"
+        raise WinnerNotFoundError(msg)
 
     def plurality_winner(self) -> str:
         r"""Compute the winner based on the plurality rule.

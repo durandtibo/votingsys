@@ -61,6 +61,25 @@ def test_single_mark_vote_get_num_voters_empty() -> None:
     assert SingleMarkVote(Counter()).get_num_voters() == 0
 
 
+def test_single_mark_vote_absolute_majority_winner_majority() -> None:
+    assert (
+        SingleMarkVote(Counter({"a": 10, "b": 20, "c": 5, "d": 3})).absolute_majority_winner()
+        == "b"
+    )
+
+
+def test_single_mark_vote_plurality_winner_no_majority() -> None:
+    vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3, "e": 10}))
+    with pytest.raises(WinnerNotFoundError):
+        vote.absolute_majority_winner()
+
+
+def test_single_mark_vote_plurality_winner_no_absolute_majority() -> None:
+    vote = SingleMarkVote(Counter({"a": 10, "b": 10}))
+    with pytest.raises(WinnerNotFoundError):
+        vote.absolute_majority_winner()
+
+
 def test_single_mark_vote_plurality_winner() -> None:
     assert SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3})).plurality_winner() == "a"
 
