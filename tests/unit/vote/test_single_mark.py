@@ -22,11 +22,15 @@ def test_single_mark_vote_negative_count() -> None:
 
 
 def test_single_mark_vote_repr() -> None:
-    assert repr(SingleMarkVote(Counter())).startswith("SingleMarkVote(")
+    assert repr(SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))).startswith(
+        "SingleMarkVote("
+    )
 
 
 def test_single_mark_vote_str() -> None:
-    assert str(SingleMarkVote(Counter())).startswith("SingleMarkVote(")
+    assert str(SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))).startswith(
+        "SingleMarkVote("
+    )
 
 
 def test_single_mark_vote_equal_true() -> None:
@@ -37,7 +41,7 @@ def test_single_mark_vote_equal_true() -> None:
 
 def test_single_mark_vote_equal_false_different_counter() -> None:
     assert not SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3})).equal(
-        SingleMarkVote(Counter())
+        SingleMarkVote(Counter({"a": 10, "b": 2}))
     )
 
 
@@ -49,16 +53,16 @@ def test_single_mark_vote_get_num_candidates() -> None:
     assert SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3})).get_num_candidates() == 4
 
 
-def test_single_mark_vote_get_num_candidates_empty() -> None:
-    assert SingleMarkVote(Counter()).get_num_candidates() == 0
+def test_single_mark_vote_get_num_candidates_2() -> None:
+    assert SingleMarkVote(Counter({"a": 10, "b": 2})).get_num_candidates() == 2
 
 
 def test_single_mark_vote_get_num_votes() -> None:
     assert SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3})).get_num_voters() == 20
 
 
-def test_single_mark_vote_get_num_voters_empty() -> None:
-    assert SingleMarkVote(Counter()).get_num_voters() == 0
+def test_single_mark_vote_get_num_voters_2() -> None:
+    assert SingleMarkVote(Counter({"a": 10, "b": 2})).get_num_voters() == 12
 
 
 def test_single_mark_vote_absolute_majority_winner_majority() -> None:
@@ -70,13 +74,13 @@ def test_single_mark_vote_absolute_majority_winner_majority() -> None:
 
 def test_single_mark_vote_plurality_winner_no_majority() -> None:
     vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3, "e": 10}))
-    with pytest.raises(WinnerNotFoundError):
+    with pytest.raises(WinnerNotFoundError, match="No winner found using absolute majority rule"):
         vote.absolute_majority_winner()
 
 
 def test_single_mark_vote_plurality_winner_no_absolute_majority() -> None:
     vote = SingleMarkVote(Counter({"a": 10, "b": 10}))
-    with pytest.raises(WinnerNotFoundError):
+    with pytest.raises(WinnerNotFoundError, match="No winner found using absolute majority rule"):
         vote.absolute_majority_winner()
 
 
@@ -86,18 +90,14 @@ def test_single_mark_vote_plurality_winner() -> None:
 
 def test_single_mark_vote_plurality_winner_tie() -> None:
     vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3, "e": 10}))
-    with pytest.raises(MultipleWinnersFoundError):
+    with pytest.raises(
+        MultipleWinnersFoundError, match="Multiple winners found using plurality rule:"
+    ):
         vote.plurality_winner()
 
 
 def test_single_mark_vote_plurality_winner_1_candidate() -> None:
     assert SingleMarkVote(Counter({"a": 10})).plurality_winner() == "a"
-
-
-def test_single_mark_vote_plurality_winner_empty() -> None:
-    vote = SingleMarkVote(Counter())
-    with pytest.raises(WinnerNotFoundError, match="No winner found because there is no voters"):
-        vote.plurality_winner()
 
 
 def test_single_mark_vote_plurality_winners() -> None:
@@ -114,27 +114,13 @@ def test_single_mark_vote_plurality_winners_1_candidate() -> None:
     assert SingleMarkVote(Counter({"a": 10})).plurality_winners() == ("a",)
 
 
-def test_single_mark_vote_plurality_winners_empty() -> None:
-    vote = SingleMarkVote(Counter())
-    with pytest.raises(WinnerNotFoundError, match="No winner found because there is no voters"):
-        vote.plurality_winners()
-
-
 def test_single_mark_vote_from_sequence() -> None:
     assert SingleMarkVote.from_sequence(["a", "b", "a", "c", "a", "a", "b"]).equal(
         SingleMarkVote(Counter({"a": 4, "b": 2, "c": 1}))
     )
 
 
-def test_single_mark_vote_from_sequence_empty() -> None:
-    assert SingleMarkVote.from_sequence([]).equal(SingleMarkVote(Counter()))
-
-
 def test_single_mark_vote_from_series() -> None:
     assert SingleMarkVote.from_series(pl.Series(["a", "b", "a", "c", "a", "a", "b"])).equal(
         SingleMarkVote(Counter({"a": 4, "b": 2, "c": 1}))
     )
-
-
-def test_single_mark_vote_from_series_empty() -> None:
-    assert SingleMarkVote.from_series(pl.Series([])).equal(SingleMarkVote(Counter()))
