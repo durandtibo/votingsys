@@ -72,16 +72,37 @@ def test_single_mark_vote_absolute_majority_winner_majority() -> None:
     )
 
 
-def test_single_mark_vote_plurality_winner_no_majority() -> None:
+def test_single_mark_vote_absolute_majority_winner_no_majority() -> None:
     vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3, "e": 10}))
     with pytest.raises(WinnerNotFoundError, match="No winner found using absolute majority rule"):
         vote.absolute_majority_winner()
 
 
-def test_single_mark_vote_plurality_winner_no_absolute_majority() -> None:
+def test_single_mark_vote_absolute_majority_winner_no_absolute_majority() -> None:
     vote = SingleMarkVote(Counter({"a": 10, "b": 10}))
     with pytest.raises(WinnerNotFoundError, match="No winner found using absolute majority rule"):
         vote.absolute_majority_winner()
+
+
+def test_single_mark_vote_super_majority_winner_majority() -> None:
+    assert (
+        SingleMarkVote(Counter({"a": 10, "b": 30, "c": 5, "d": 3})).super_majority_winner(0.6)
+        == "b"
+    )
+
+
+def test_single_mark_vote_super_winner_no_majority() -> None:
+    vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3, "e": 10}))
+    with pytest.raises(
+        WinnerNotFoundError, match="No winner found using super majority rule with threshold=0.6"
+    ):
+        vote.super_majority_winner(0.6)
+
+
+def test_single_mark_vote_super_winner_invalid_threshold() -> None:
+    vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3, "e": 10}))
+    with pytest.raises(ValueError, match=r"threshold must be >0.5 \(received 0.4\)"):
+        vote.super_majority_winner(0.4)
 
 
 def test_single_mark_vote_plurality_winner() -> None:

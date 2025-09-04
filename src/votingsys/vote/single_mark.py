@@ -100,6 +100,45 @@ class SingleMarkVote(BaseVote):
         msg = "No winner found using absolute majority rule"
         raise WinnerNotFoundError(msg)
 
+    def super_majority_winner(self, threshold: float) -> str:
+        r"""Compute the winner based on the super majority rule.
+
+        The candidate receiving more than X% of the vote is the winner,
+        where ``X > 0.5``.
+
+        Args:
+            threshold: The minimal threshold to find the super majority
+                winner.
+
+        Returns:
+            The winner based on the super majority rule.
+
+        Raises:
+            WinnerNotFoundError: if no candidate has the super majority of votes.
+            ValueError: if the threshold is not valid.
+
+        Example usage:
+
+        ```pycon
+
+        >>> from collections import Counter
+        >>> from votingsys.vote import SingleMarkVote
+        >>> vote = SingleMarkVote(Counter({"a": 10, "b": 30, "c": 5, "d": 3}))
+        >>> vote.super_majority_winner(0.6)
+        'b'
+
+        ```
+        """
+        if threshold <= 0.5:
+            msg = f"threshold must be >0.5 (received {threshold})"
+            raise ValueError(msg)
+        total_votes = self.get_num_voters()
+        candidate, num_votes = self._counter.most_common(1)[0]
+        if num_votes / total_votes > threshold:
+            return candidate
+        msg = f"No winner found using super majority rule with threshold={threshold}"
+        raise WinnerNotFoundError(msg)
+
     def plurality_winner(self) -> str:
         r"""Compute the winner based on the plurality rule.
 
