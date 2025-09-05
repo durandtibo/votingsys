@@ -19,6 +19,19 @@ def check_colum_missing(frame: pl.DataFrame, col: str) -> None:
 
     Raises:
         ValueError: if the column exists in the DataFrame.
+
+    Example usage:
+
+    ```pycon
+
+    >>> import polars as pl
+    >>> from votingsys.utils.dataframe import check_colum_missing
+    >>> check_colum_missing(
+    ...     pl.DataFrame({"a": [0, 1, 2, 1, 0], "b": [1, 2, 0, 2, 1], "c": [2, 0, 1, 0, 2]}),
+    ...     col="col",
+    ... )
+
+    ```
     """
     if col in frame:
         msg = f"column '{col}' exists in the DataFrame: {sorted(frame.columns)}"
