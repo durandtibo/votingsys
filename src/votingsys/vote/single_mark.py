@@ -7,11 +7,11 @@ __all__ = ["SingleMarkVote"]
 from collections import Counter
 from typing import TYPE_CHECKING, Any
 
-from black.trans import defaultdict
 from coola import objects_are_equal
 from coola.utils.format import repr_indent, repr_mapping
 
 from votingsys.utils.counter import check_non_empty_count, check_non_negative_count
+from votingsys.utils.dataframe import check_column_exist
 from votingsys.vote.base import (
     BaseVote,
     MultipleWinnersFoundError,
@@ -298,9 +298,13 @@ class SingleMarkVote(BaseVote):
 
         ```
         """
+        check_column_exist(frame, choice_col)
         choices = frame[choice_col].to_list()
-        counts = [1] * len(choices) if count_col is None else frame[count_col].to_list()
-        counter = defaultdict(int)
+        counts = [1] * len(choices)
+        if count_col is not None:
+            check_column_exist(frame, count_col)
+            counts = frame[count_col].to_list()
+        counter = Counter()
         for choice, count in zip(choices, counts):
             counter[choice] += count
-        return cls(Counter(dict(counter)))
+        return cls(counter)
