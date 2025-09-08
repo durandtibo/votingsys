@@ -145,3 +145,35 @@ def test_single_mark_vote_from_series() -> None:
     assert SingleMarkVote.from_series(pl.Series(["a", "b", "a", "c", "a", "a", "b"])).equal(
         SingleMarkVote(Counter({"a": 4, "b": 2, "c": 1}))
     )
+
+
+def test_single_mark_vote_from_dataframe_without_count_col() -> None:
+    assert SingleMarkVote.from_dataframe(
+        pl.DataFrame({"first_choice": ["a", "b", "a", "c", "a", "a", "b"]}),
+        choice_col="first_choice",
+    ).equal(SingleMarkVote(Counter({"a": 4, "b": 2, "c": 1})))
+
+
+def test_single_mark_vote_from_dataframe_with_count_col() -> None:
+    assert SingleMarkVote.from_dataframe(
+        pl.DataFrame(
+            {
+                "first_choice": ["a", "b", "a", "c", "a", "a", "b"],
+                "count": [3, 3, 5, 2, 2, 6, 1],
+            }
+        ),
+        choice_col="first_choice",
+        count_col="count",
+    ).equal(SingleMarkVote(Counter({"a": 16, "b": 4, "c": 2})))
+
+
+def test_single_mark_vote_from_dataframe_ignore_count_col() -> None:
+    assert SingleMarkVote.from_dataframe(
+        pl.DataFrame(
+            {
+                "first_choice": ["a", "b", "a", "c", "a", "a", "b"],
+                "count": [3, 3, 5, 2, 2, 6, 1],
+            }
+        ),
+        choice_col="first_choice",
+    ).equal(SingleMarkVote(Counter({"a": 4, "b": 2, "c": 1})))

@@ -7,6 +7,7 @@ __all__ = ["SingleMarkVote"]
 from collections import Counter
 from typing import TYPE_CHECKING, Any
 
+from black.trans import defaultdict
 from coola import objects_are_equal
 from coola.utils.format import repr_indent, repr_mapping
 
@@ -222,12 +223,12 @@ class SingleMarkVote(BaseVote):
         return cls(Counter(votes))
 
     @classmethod
-    def from_series(cls, votes: pl.Series) -> SingleMarkVote:
+    def from_series(cls, choices: pl.Series) -> SingleMarkVote:
         r"""Instantiate a ``SingleMarkVote`` object from a
-        ``polars.Series`` containing the votes.
+        ``polars.Series`` containing the choices.
 
         Args:
-            votes: The ``polars.Series`` containing the votes.
+            choices: The ``polars.Series`` containing the choices.
 
         Returns:
             The instantiated ``SingleMarkVote``.
@@ -238,7 +239,7 @@ class SingleMarkVote(BaseVote):
 
         >>> import polars as pl
         >>> from votingsys.vote import SingleMarkVote
-        >>> vote = SingleMarkVote.from_sequence(pl.Series(["a", "b", "a", "c", "a", "a", "b"]))
+        >>> vote = SingleMarkVote.from_series(pl.Series(["a", "b", "a", "c", "a", "a", "b"]))
         >>> vote
         SingleMarkVote(
           (counter): Counter({'a': 4, 'b': 2, 'c': 1})
@@ -246,4 +247,60 @@ class SingleMarkVote(BaseVote):
 
         ```
         """
-        return cls.from_sequence(votes.to_list())
+        return cls.from_sequence(choices.to_list())
+
+    @classmethod
+    def from_dataframe(
+        cls, frame: pl.DataFrame, choice_col: str, count_col: str | None = None
+    ) -> SingleMarkVote:
+        r"""Instantiate a ``SingleMarkVote`` object from a
+        ``polars.DataFrame`` containing the choices.
+
+        Args:
+            frame: The input DataFrame containing the choices.
+            choice_col: The column containing the choices.
+            count_col: The column containing the count for each choice.
+                If ``None``, it assumes the count for each choice is 1.
+
+        Returns:
+            The instantiated ``SingleMarkVote``.
+
+        Example usage:
+
+        ```pycon
+
+        >>> import polars as pl
+        >>> from votingsys.vote import SingleMarkVote
+        >>> # Example without count column
+        >>> vote = SingleMarkVote.from_dataframe(
+        ...     pl.DataFrame({"first_choice": ["a", "b", "a", "c", "a", "a", "b"]}),
+        ...     choice_col="first_choice",
+        ... )
+        >>> vote
+        SingleMarkVote(
+          (counter): Counter({'a': 4, 'b': 2, 'c': 1})
+        )
+        >>> # Example with count column
+        >>> vote = SingleMarkVote.from_dataframe(
+        ...     pl.DataFrame(
+        ...         {
+        ...             "first_choice": ["a", "b", "a", "c", "a", "a", "b"],
+        ...             "count": [3, 3, 5, 2, 2, 6, 1],
+        ...         }
+        ...     ),
+        ...     choice_col="first_choice",
+        ...     count_col="count",
+        ... )
+        >>> vote
+        SingleMarkVote(
+          (counter): Counter({'a': 16, 'b': 4, 'c': 2})
+        )
+
+        ```
+        """
+        choices = frame[choice_col].to_list()
+        counts = [1] * len(choices) if count_col is None else frame[count_col].to_list()
+        counter = defaultdict(int)
+        for choice, count in zip(choices, counts):
+            counter[choice] += count
+        return cls(Counter(dict(counter)))
