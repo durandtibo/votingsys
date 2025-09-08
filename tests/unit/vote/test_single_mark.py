@@ -177,3 +177,25 @@ def test_single_mark_vote_from_dataframe_ignore_count_col() -> None:
         ),
         choice_col="first_choice",
     ).equal(SingleMarkVote(Counter({"a": 4, "b": 2, "c": 1})))
+
+
+def test_single_mark_vote_from_dataframe_missing_choice_col() -> None:
+    frame = pl.DataFrame(
+        {
+            "first_choice": ["a", "b", "a", "c", "a", "a", "b"],
+            "count": [3, 3, 5, 2, 2, 6, 1],
+        }
+    )
+    with pytest.raises(ValueError, match="column 'choice' is missing in the DataFrame:"):
+        SingleMarkVote.from_dataframe(frame, choice_col="choice")
+
+
+def test_single_mark_vote_from_dataframe_missing_count_col() -> None:
+    frame = pl.DataFrame(
+        {
+            "first_choice": ["a", "b", "a", "c", "a", "a", "b"],
+            "count": [3, 3, 5, 2, 2, 6, 1],
+        }
+    )
+    with pytest.raises(ValueError, match="column 'c' is missing in the DataFrame:"):
+        SingleMarkVote.from_dataframe(frame, choice_col="first_choice", count_col="c")
