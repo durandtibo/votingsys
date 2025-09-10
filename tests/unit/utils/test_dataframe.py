@@ -8,6 +8,7 @@ from votingsys.utils.dataframe import (
     check_column_exist,
     check_column_missing,
     count_value_per_column,
+    weighted_value_count,
 )
 
 ########################################
@@ -100,3 +101,62 @@ def test_count_value_per_column_empty() -> None:
 def test_count_value_per_column_value_none() -> None:
     with pytest.raises(ValueError, match=r"value cannot be None"):
         count_value_per_column(pl.DataFrame(), value=None)
+
+
+##########################################
+#     Tests for weighted_value_count     #
+##########################################
+
+
+@pytest.mark.parametrize(
+    ("value", "counts"),
+    [
+        (0, {"a": 3, "b": 2, "c": 6}),
+        (1, {"a": 5, "b": 4, "c": 2}),
+        (2, {"a": 3, "b": 5, "c": 3}),
+        (3, {"a": 0, "b": 0, "c": 0}),
+    ],
+)
+def test_weighted_value_count(value: int, counts: dict) -> None:
+    assert objects_are_equal(
+        weighted_value_count(
+            pl.DataFrame(
+                {"a": [0, 1, 2, 2], "b": [1, 2, 0, 1], "c": [2, 0, 1, 0], "count": [3, 5, 2, 1]}
+            ),
+            value=value,
+            weight_col="count",
+        ),
+        counts,
+    )
+
+
+@pytest.mark.parametrize(
+    ("value", "counts"),
+    [
+        (0, {"a": 3, "b": 2, "c": 1}),
+        (1, {"a": 5, "b": 4, "c": 2}),
+        (2, {"a": 1, "b": 5, "c": 3}),
+        (3, {"a": 0, "b": 0, "c": 0}),
+    ],
+)
+def test_weighted_value_count_with_nulls(value: int, counts: dict) -> None:
+    assert objects_are_equal(
+        weighted_value_count(
+            pl.DataFrame(
+                {
+                    "a": [0, 1, None, 2],
+                    "b": [1, 2, 0, 1],
+                    "c": [2, None, 1, 0],
+                    "count": [3, 5, 2, 1],
+                }
+            ),
+            value=value,
+            weight_col="count",
+        ),
+        counts,
+    )
+
+
+def test_weighted_value_count_empty() -> None:
+    with pytest.raises(ValueError, match=r"column 'count' is missing in the DataFrame"):
+        weighted_value_count(pl.DataFrame(), value=1, weight_col="count")
