@@ -17,7 +17,7 @@ def test_check_column_exist() -> None:
 
 
 def test_check_column_exist_missing() -> None:
-    with pytest.raises(ValueError, match="column 'd' is missing in the DataFrame:"):
+    with pytest.raises(ValueError, match=r"column 'd' is missing in the DataFrame:"):
         check_column_exist(
             pl.DataFrame({"a": [1, 2, 3], "b": ["a", "b", "c"], "c": [1.1, 2.2, 3.3]}), col="d"
         )
@@ -39,7 +39,7 @@ def test_check_column_missing_empty() -> None:
 
 
 def test_check_column_missing_exist() -> None:
-    with pytest.raises(ValueError, match="column 'a' exists in the DataFrame:"):
+    with pytest.raises(ValueError, match=r"column 'a' exists in the DataFrame:"):
         check_column_missing(
             pl.DataFrame({"a": [1, 2, 3], "b": ["a", "b", "c"], "c": [1.1, 2.2, 3.3]}), col="a"
         )

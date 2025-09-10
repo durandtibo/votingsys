@@ -17,7 +17,7 @@ from votingsys.vote import (
 
 
 def test_single_mark_vote_negative_count() -> None:
-    with pytest.raises(ValueError, match="The count for 'b' is negative: -2"):
+    with pytest.raises(ValueError, match=r"The count for 'b' is negative: -2"):
         SingleMarkVote(Counter({"a": 0, "b": -2, "c": 5, "d": 3}))
 
 
@@ -74,13 +74,13 @@ def test_single_mark_vote_absolute_majority_winner_majority() -> None:
 
 def test_single_mark_vote_absolute_majority_winner_no_majority() -> None:
     vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3, "e": 10}))
-    with pytest.raises(WinnerNotFoundError, match="No winner found using absolute majority rule"):
+    with pytest.raises(WinnerNotFoundError, match=r"No winner found using absolute majority rule"):
         vote.absolute_majority_winner()
 
 
 def test_single_mark_vote_absolute_majority_winner_no_absolute_majority() -> None:
     vote = SingleMarkVote(Counter({"a": 10, "b": 10}))
-    with pytest.raises(WinnerNotFoundError, match="No winner found using absolute majority rule"):
+    with pytest.raises(WinnerNotFoundError, match=r"No winner found using absolute majority rule"):
         vote.absolute_majority_winner()
 
 
@@ -94,7 +94,7 @@ def test_single_mark_vote_super_majority_winner_majority() -> None:
 def test_single_mark_vote_super_winner_no_majority() -> None:
     vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3, "e": 10}))
     with pytest.raises(
-        WinnerNotFoundError, match="No winner found using super majority rule with threshold=0.6"
+        WinnerNotFoundError, match=r"No winner found using super majority rule with threshold=0.6"
     ):
         vote.super_majority_winner(0.6)
 
@@ -112,7 +112,7 @@ def test_single_mark_vote_plurality_winner() -> None:
 def test_single_mark_vote_plurality_winner_tie() -> None:
     vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3, "e": 10}))
     with pytest.raises(
-        MultipleWinnersFoundError, match="Multiple winners found using plurality rule:"
+        MultipleWinnersFoundError, match=r"Multiple winners found using plurality rule:"
     ):
         vote.plurality_winner()
 
@@ -186,7 +186,7 @@ def test_single_mark_vote_from_dataframe_missing_choice_col() -> None:
             "count": [3, 3, 5, 2, 2, 6, 1],
         }
     )
-    with pytest.raises(ValueError, match="column 'choice' is missing in the DataFrame:"):
+    with pytest.raises(ValueError, match=r"column 'choice' is missing in the DataFrame:"):
         SingleMarkVote.from_dataframe(frame, choice_col="choice")
 
 
@@ -197,5 +197,5 @@ def test_single_mark_vote_from_dataframe_missing_count_col() -> None:
             "count": [3, 3, 5, 2, 2, 6, 1],
         }
     )
-    with pytest.raises(ValueError, match="column 'c' is missing in the DataFrame:"):
+    with pytest.raises(ValueError, match=r"column 'c' is missing in the DataFrame:"):
         SingleMarkVote.from_dataframe(frame, choice_col="first_choice", count_col="c")

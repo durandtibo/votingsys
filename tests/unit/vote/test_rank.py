@@ -18,7 +18,7 @@ def ranking() -> pl.DataFrame:
 
 
 def test_ranked_vote_init_missing_count_col(ranking: pl.DataFrame) -> None:
-    with pytest.raises(ValueError, match="column 'missing' is missing in the DataFrame:"):
+    with pytest.raises(ValueError, match=r"column 'missing' is missing in the DataFrame:"):
         RankedVote(ranking, count_col="missing")
 
 
