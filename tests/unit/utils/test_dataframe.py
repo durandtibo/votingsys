@@ -157,6 +157,33 @@ def test_weighted_value_count_with_nulls(value: int, counts: dict) -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("value", "counts"),
+    [
+        (0, {"a": 2.5, "b": 1.0, "c": 1.7}),
+        (1, {"a": 0.5, "b": 3.7, "c": 1.0}),
+        (2, {"a": 2.2, "b": 0.5, "c": 2.5}),
+        (3, {"a": 0.0, "b": 0.0, "c": 0.0}),
+    ],
+)
+def test_weighted_value_count_float_weight(value: int, counts: dict) -> None:
+    assert objects_are_equal(
+        weighted_value_count(
+            pl.DataFrame(
+                {
+                    "a": [0, 1, 2, 2],
+                    "b": [1, 2, 0, 1],
+                    "c": [2, 0, 1, 0],
+                    "count": [2.5, 0.5, 1.0, 1.2],
+                }
+            ),
+            value=value,
+            weight_col="count",
+        ),
+        counts,
+    )
+
+
 def test_weighted_value_count_empty() -> None:
     with pytest.raises(ValueError, match=r"column 'count' is missing in the DataFrame"):
         weighted_value_count(pl.DataFrame(), value=1, weight_col="count")

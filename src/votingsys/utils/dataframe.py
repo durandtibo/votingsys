@@ -115,7 +115,9 @@ def value_count(frame: pl.DataFrame, value: Any) -> dict[str, int]:
     return {key: value[0] for key, value in counts.items()}
 
 
-def weighted_value_count(frame: pl.DataFrame, value: int, weight_col: str) -> dict:
+def weighted_value_count(
+    frame: pl.DataFrame, value: int, weight_col: str
+) -> dict[str, int | float]:
     r"""Count the weighted occurrences of a given value in each column of
     a DataFrame.
 
