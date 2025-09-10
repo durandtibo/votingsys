@@ -5,7 +5,7 @@ from __future__ import annotations
 __all__ = [
     "check_column_exist",
     "check_column_missing",
-    "count_value_per_column",
+    "value_count",
     "weighted_value_count",
 ]
 
@@ -70,23 +70,31 @@ def check_column_missing(frame: pl.DataFrame, col: str) -> None:
         raise ValueError(msg)
 
 
-def count_value_per_column(frame: pl.DataFrame, value: Any) -> dict[str, int]:
-    r"""Count the number of value occurrences per column.
+def value_count(frame: pl.DataFrame, value: Any) -> dict[str, int]:
+    r"""Count the occurrences of a given value in each column of a
+    DataFrame.
+
+    This function computes how many times a specified value appears in
+    each column. Null values are ignored during the counting process.
 
     Args:
-        frame: The DataFrame containg the data.
-        value: The target value used to find the number of occurences.
+        frame: The input DataFrame.
+        value: The value to count in each column.
 
     Returns:
-        A dictionary with the count per column.
+        A dictionary mapping each column name to the number of times
+            the specified value appears.
+
+    Raises:
+        ValueError: If the specified value is ``None``.
 
     Example usage:
 
     ```pycon
 
     >>> import polars as pl
-    >>> from votingsys.utils.dataframe import count_value_per_column
-    >>> counts = count_value_per_column(
+    >>> from votingsys.utils.dataframe import value_count
+    >>> counts = value_count(
     ...     pl.DataFrame({"a": [0, 1, 2, 1, 0], "b": [1, 2, 0, 2, 1], "c": [2, 0, 1, 0, 2]}),
     ...     value=1,
     ... )
@@ -125,6 +133,9 @@ def weighted_value_count(frame: pl.DataFrame, value: int, weight_col: str) -> di
         A dictionary mapping each column name (excluding the count
             column) to the weighted number of times the specified
             value appears.
+
+    Raises:
+        ValueError: if the weight column is missing in the DataFrame.
 
     Example usage:
 

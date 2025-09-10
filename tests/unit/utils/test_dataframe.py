@@ -7,7 +7,7 @@ from coola import objects_are_equal
 from votingsys.utils.dataframe import (
     check_column_exist,
     check_column_missing,
-    count_value_per_column,
+    value_count,
     weighted_value_count,
 )
 
@@ -52,7 +52,7 @@ def test_check_column_missing_exist() -> None:
 
 
 ############################################
-#     Tests for count_value_per_column     #
+#     Tests for value_count     #
 ############################################
 
 
@@ -65,9 +65,9 @@ def test_check_column_missing_exist() -> None:
         (3, {"a": 0, "b": 0, "c": 0}),
     ],
 )
-def test_count_value_per_column(value: int, counts: dict) -> None:
+def test_value_count(value: int, counts: dict) -> None:
     assert objects_are_equal(
-        count_value_per_column(
+        value_count(
             pl.DataFrame({"a": [0, 1, 2, 1, 0], "b": [1, 2, 0, 2, 1], "c": [2, 0, 1, 0, 2]}),
             value=value,
         ),
@@ -84,9 +84,9 @@ def test_count_value_per_column(value: int, counts: dict) -> None:
         (3, {"a": 0, "b": 0, "c": 0}),
     ],
 )
-def test_count_value_per_column_with_nulls(value: int, counts: dict) -> None:
+def test_value_count_with_nulls(value: int, counts: dict) -> None:
     assert objects_are_equal(
-        count_value_per_column(
+        value_count(
             pl.DataFrame({"a": [0, 1, 2, None, 0], "b": [1, 2, 0, 2, 1], "c": [None, 0, 1, 0, 2]}),
             value=value,
         ),
@@ -94,13 +94,13 @@ def test_count_value_per_column_with_nulls(value: int, counts: dict) -> None:
     )
 
 
-def test_count_value_per_column_empty() -> None:
-    assert objects_are_equal(count_value_per_column(pl.DataFrame(), value=1), {})
+def test_value_count_empty() -> None:
+    assert objects_are_equal(value_count(pl.DataFrame(), value=1), {})
 
 
-def test_count_value_per_column_value_none() -> None:
+def test_value_count_value_none() -> None:
     with pytest.raises(ValueError, match=r"value cannot be None"):
-        count_value_per_column(pl.DataFrame(), value=None)
+        value_count(pl.DataFrame(), value=None)
 
 
 ##########################################
