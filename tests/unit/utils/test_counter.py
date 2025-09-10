@@ -16,7 +16,7 @@ def test_check_non_empty_count_valid() -> None:
 
 
 def test_check_non_empty_count_empty() -> None:
-    with pytest.raises(ValueError, match="The counter is empty"):
+    with pytest.raises(ValueError, match=r"The counter is empty"):
         check_non_empty_count(Counter())
 
 
@@ -34,5 +34,5 @@ def test_check_non_negative_count_valid_empty() -> None:
 
 
 def test_check_non_negative_count_invalid() -> None:
-    with pytest.raises(ValueError, match="The count for 'b' is negative: -2"):
+    with pytest.raises(ValueError, match=r"The count for 'b' is negative: -2"):
         check_non_negative_count(Counter({"a": 0, "b": -2, "c": 5, "d": 3}))

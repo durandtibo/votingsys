@@ -72,5 +72,5 @@ def test_compute_count_aggregated_dataframe_count_col_exist() -> None:
         },
         schema={"a": pl.Int64, "b": pl.Int64, "c": pl.Int64},
     )
-    with pytest.raises(ValueError, match="column 'c' exists in the DataFrame:"):
+    with pytest.raises(ValueError, match=r"column 'c' exists in the DataFrame:"):
         compute_count_aggregated_dataframe(frame, count_col="c")
