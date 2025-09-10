@@ -5,6 +5,7 @@ from __future__ import annotations
 __all__ = [
     "check_column_exist",
     "check_column_missing",
+    "sum_weights_by_group",
     "value_count",
     "weighted_value_count",
 ]
@@ -169,3 +170,55 @@ def weighted_value_count(
         ]
     ).to_dict(as_series=False)
     return {key: value[0] for key, value in counts.items()}
+
+
+def sum_weights_by_group(frame: pl.DataFrame, weight_col: str) -> pl.DataFrame:
+    """Aggregate a DataFrame by summing the weight values for rows with
+    identical values in all columns except the weight column.
+
+    Args:
+        frame: The input DataFrame to aggregate.
+        weight_col: The name of the column that contains the weight
+            values to be summed.
+
+    Returns:
+            A new DataFrame with rows grouped by all non-weight columns,
+            and the weight column summed within each group.
+
+    Raises:
+        ValueError: if ``weight_col`` does not exist in the DataFrame.
+
+    Example usage:
+
+    ```pycon
+
+    >>> import polars as pl
+    >>> from votingsys.utils.dataframe import sum_weights_by_group
+    >>> out = sum_weights_by_group(
+    ...     pl.DataFrame(
+    ...         {
+    ...             "a": [0, 1, 2, 0, 1, 2],
+    ...             "b": [1, 2, 0, 1, 2, 0],
+    ...             "c": [2, 0, 1, 2, 0, 1],
+    ...             "weight": [3, 5, 2, 1, 2, -2],
+    ...         }
+    ...     ),
+    ...     weight_col="weight",
+    ... )
+    >>> out.sort("weight", descending=True)
+    shape: (3, 4)
+    ┌─────┬─────┬─────┬────────┐
+    │ a   ┆ b   ┆ c   ┆ weight │
+    │ --- ┆ --- ┆ --- ┆ ---    │
+    │ i64 ┆ i64 ┆ i64 ┆ i64    │
+    ╞═════╪═════╪═════╪════════╡
+    │ 1   ┆ 2   ┆ 0   ┆ 7      │
+    │ 0   ┆ 1   ┆ 2   ┆ 4      │
+    │ 2   ┆ 0   ┆ 1   ┆ 0      │
+    └─────┴─────┴─────┴────────┘
+
+    ```
+    """
+    check_column_exist(frame, weight_col)
+    group_cols = [col for col in frame.columns if col != weight_col]
+    return frame.group_by(group_cols).agg(pl.col(weight_col).sum().alias(weight_col))
