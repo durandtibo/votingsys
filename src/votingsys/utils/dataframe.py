@@ -2,14 +2,16 @@ r"""Contain DataFrame utility functions."""
 
 from __future__ import annotations
 
-__all__ = ["check_column_exist", "check_column_missing", "count_value_per_column"]
+__all__ = [
+    "check_column_exist",
+    "check_column_missing",
+    "count_value_per_column",
+    "weighted_value_count",
+]
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import polars as pl
-
-if TYPE_CHECKING:
-    import numpy as np
 
 
 def check_column_exist(frame: pl.DataFrame, col: str) -> None:
@@ -68,7 +70,7 @@ def check_column_missing(frame: pl.DataFrame, col: str) -> None:
         raise ValueError(msg)
 
 
-def count_value_per_column(frame: pl.DataFrame, value: Any) -> np.ndarray:
+def count_value_per_column(frame: pl.DataFrame, value: Any) -> dict[str, int]:
     r"""Count the number of value occurrences per column.
 
     Args:
@@ -100,6 +102,57 @@ def count_value_per_column(frame: pl.DataFrame, value: Any) -> np.ndarray:
         [
             ((pl.col(col) == value) & pl.col(col).is_not_null()).sum().alias(col)
             for col in frame.columns
+        ]
+    ).to_dict(as_series=False)
+    return {key: value[0] for key, value in counts.items()}
+
+
+def weighted_value_count(frame: pl.DataFrame, value: int, weight_col: str) -> dict:
+    r"""Count the weighted occurrences of a given value in each column of
+    a DataFrame.
+
+    This function computes how many times a specified value appears in
+    each column, weighted by the values in a separate count column.
+    Null values are ignored during the counting process.
+
+    Args:
+        frame: The input DataFrame.
+        value: The value to count in each column.
+        weight_col: The name of the column that holds the weight for
+            each row.
+
+    Returns:
+        A dictionary mapping each column name (excluding the count
+            column) to the weighted number of times the specified
+            value appears.
+
+    Example usage:
+
+    ```pycon
+
+    >>> import polars as pl
+    >>> from votingsys.utils.dataframe import weighted_value_count
+    >>> counts = weighted_value_count(
+    ...     pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 5, 2]}),
+    ...     value=1,
+    ...     weight_col="count",
+    ... )
+    >>> counts
+    {'a': 5, 'b': 3, 'c': 2}
+
+    ```
+    """
+    check_column_exist(frame, weight_col)
+    counts = frame.select(
+        [
+            (
+                ((pl.col(col) == value) & pl.col(col).is_not_null()).cast(pl.Int32)
+                * pl.col(weight_col)
+            )
+            .sum()
+            .alias(col)
+            for col in frame.columns
+            if col != weight_col
         ]
     ).to_dict(as_series=False)
     return {key: value[0] for key, value in counts.items()}
