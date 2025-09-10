@@ -205,7 +205,7 @@ def sum_weights_by_group(frame: pl.DataFrame, weight_col: str) -> pl.DataFrame:
     ...     ),
     ...     weight_col="weight",
     ... )
-    >>> out
+    >>> out.sort("weight", descending=True)
     shape: (3, 4)
     ┌─────┬─────┬─────┬────────┐
     │ a   ┆ b   ┆ c   ┆ weight │
