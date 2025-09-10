@@ -2,8 +2,13 @@ from __future__ import annotations
 
 import polars as pl
 import pytest
+from coola import objects_are_equal
 
-from votingsys.utils.dataframe import check_column_exist, check_column_missing
+from votingsys.utils.dataframe import (
+    check_column_exist,
+    check_column_missing,
+    count_value_per_column,
+)
 
 ########################################
 #     Tests for check_column_exist     #
@@ -43,3 +48,55 @@ def test_check_column_missing_exist() -> None:
         check_column_missing(
             pl.DataFrame({"a": [1, 2, 3], "b": ["a", "b", "c"], "c": [1.1, 2.2, 3.3]}), col="a"
         )
+
+
+############################################
+#     Tests for count_value_per_column     #
+############################################
+
+
+@pytest.mark.parametrize(
+    ("value", "counts"),
+    [
+        (0, {"a": 2, "b": 1, "c": 2}),
+        (1, {"a": 2, "b": 2, "c": 1}),
+        (2, {"a": 1, "b": 2, "c": 2}),
+        (3, {"a": 0, "b": 0, "c": 0}),
+    ],
+)
+def test_count_value_per_column(value: int, counts: dict) -> None:
+    assert objects_are_equal(
+        count_value_per_column(
+            pl.DataFrame({"a": [0, 1, 2, 1, 0], "b": [1, 2, 0, 2, 1], "c": [2, 0, 1, 0, 2]}),
+            value=value,
+        ),
+        counts,
+    )
+
+
+@pytest.mark.parametrize(
+    ("value", "counts"),
+    [
+        (0, {"a": 2, "b": 1, "c": 2}),
+        (1, {"a": 1, "b": 2, "c": 1}),
+        (2, {"a": 1, "b": 2, "c": 1}),
+        (3, {"a": 0, "b": 0, "c": 0}),
+    ],
+)
+def test_count_value_per_column_with_nulls(value: int, counts: dict) -> None:
+    assert objects_are_equal(
+        count_value_per_column(
+            pl.DataFrame({"a": [0, 1, 2, None, 0], "b": [1, 2, 0, 2, 1], "c": [None, 0, 1, 0, 2]}),
+            value=value,
+        ),
+        counts,
+    )
+
+
+def test_count_value_per_column_empty() -> None:
+    assert objects_are_equal(count_value_per_column(pl.DataFrame(), value=1), {})
+
+
+def test_count_value_per_column_value_none() -> None:
+    with pytest.raises(ValueError, match=r"value cannot be None"):
+        count_value_per_column(pl.DataFrame(), value=None)
