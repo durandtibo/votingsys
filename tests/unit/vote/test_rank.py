@@ -14,7 +14,12 @@ from votingsys.vote import (
 
 @pytest.fixture
 def ranking() -> pl.DataFrame:
-    return pl.DataFrame({"a": [0, 1, 2, 1, 0], "b": [1, 2, 0, 2, 1], "c": [2, 0, 1, 0, 2]})
+    return pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 5, 2]})
+
+
+def test_ranked_vote_init_missing_count_col(ranking: pl.DataFrame) -> None:
+    with pytest.raises(ValueError, match="column 'missing' is missing in the DataFrame:"):
+        RankedVote(ranking, count_col="missing")
 
 
 def test_ranked_vote_repr(ranking: pl.DataFrame) -> None:
@@ -27,17 +32,21 @@ def test_ranked_vote_str(ranking: pl.DataFrame) -> None:
 
 def test_ranked_vote_equal_true() -> None:
     assert RankedVote(
-        pl.DataFrame({"a": [0, 1, 2, 1, 0], "b": [1, 2, 0, 2, 1], "c": [2, 0, 1, 0, 2]})
+        pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 5, 2]})
     ).equal(
-        RankedVote(pl.DataFrame({"a": [0, 1, 2, 1, 0], "b": [1, 2, 0, 2, 1], "c": [2, 0, 1, 0, 2]}))
+        RankedVote(
+            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 5, 2]})
+        )
     )
 
 
 def test_ranked_vote_equal_false_different_ranking() -> None:
     assert not RankedVote(
-        pl.DataFrame({"a": [0, 1, 2, 1, 0], "b": [1, 2, 0, 2, 1], "c": [2, 0, 1, 0, 2]})
+        pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 5, 2]})
     ).equal(
-        RankedVote(pl.DataFrame({"a": [0, 0, 0, 0, 0], "b": [1, 1, 1, 1, 1], "c": [2, 2, 2, 2, 2]}))
+        RankedVote(
+            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [2, 1, 3]})
+        )
     )
 
 
@@ -54,10 +63,11 @@ def test_ranked_vote_get_num_candidates_2() -> None:
         RankedVote(
             pl.DataFrame(
                 {
-                    "a": [0, 1, 2, 1, 0, 3],
-                    "b": [1, 2, 0, 2, 1, 2],
-                    "c": [2, 0, 1, 0, 2, 1],
-                    "d": [3, 3, 3, 3, 3, 0],
+                    "a": [0, 1, 2, 3],
+                    "b": [1, 2, 0, 2],
+                    "c": [2, 0, 1, 1],
+                    "d": [3, 3, 3, 0],
+                    "count": [3, 5, 2, 1],
                 }
             )
         ).get_num_candidates()
@@ -66,7 +76,7 @@ def test_ranked_vote_get_num_candidates_2() -> None:
 
 
 def test_ranked_vote_get_num_votes(ranking: pl.DataFrame) -> None:
-    assert RankedVote(ranking).get_num_voters() == 5
+    assert RankedVote(ranking).get_num_voters() == 10
 
 
 def test_ranked_vote_get_num_voters_2() -> None:
@@ -74,12 +84,13 @@ def test_ranked_vote_get_num_voters_2() -> None:
         RankedVote(
             pl.DataFrame(
                 {
-                    "a": [0, 1, 2, 1, 0, 3],
-                    "b": [1, 2, 0, 2, 1, 2],
-                    "c": [2, 0, 1, 0, 2, 1],
-                    "d": [3, 3, 3, 3, 3, 0],
+                    "a": [0, 1, 2, 3],
+                    "b": [1, 2, 0, 2],
+                    "c": [2, 0, 1, 1],
+                    "d": [3, 3, 3, 0],
+                    "count": [3, 5, 2, 1],
                 }
             )
         ).get_num_voters()
-        == 6
+        == 11
     )
