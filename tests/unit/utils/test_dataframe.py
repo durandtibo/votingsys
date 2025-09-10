@@ -217,3 +217,60 @@ def test_sum_weights_by_group() -> None:
             }
         ),
     )
+
+
+def test_sum_weights_by_group_empty() -> None:
+    assert objects_are_equal(
+        sum_weights_by_group(
+            pl.DataFrame({"a": [], "b": [], "c": [], "weight": []}),
+            weight_col="weight",
+        ),
+        pl.DataFrame({"a": [], "b": [], "c": [], "weight": []}),
+    )
+
+
+def test_sum_weights_by_group_unique() -> None:
+    assert objects_are_equal(
+        sum_weights_by_group(
+            pl.DataFrame(
+                {
+                    "a": [1, 0, 2],
+                    "b": [2, 1, 0],
+                    "c": [0, 2, 1],
+                    "weight": [7, 4, 0],
+                }
+            ),
+            weight_col="weight",
+        ).sort("weight", descending=True),
+        pl.DataFrame(
+            {
+                "a": [1, 0, 2],
+                "b": [2, 1, 0],
+                "c": [0, 2, 1],
+                "weight": [7, 4, 0],
+            }
+        ),
+    )
+
+
+def test_sum_weights_by_group_one() -> None:
+    assert objects_are_equal(
+        sum_weights_by_group(
+            pl.DataFrame({"a": ["x", "x", "x", "x"], "b": [1, 1, 1, 1], "weight": [7, 4, 0, 2]}),
+            weight_col="weight",
+        ).sort("weight", descending=True),
+        pl.DataFrame({"a": ["x"], "b": [1], "weight": [13]}),
+    )
+
+
+def test_weighted_value_count_missing_column() -> None:
+    frame = pl.DataFrame(
+        {
+            "a": [0, 1, 2, 0, 1, 2],
+            "b": [1, 2, 0, 1, 2, 0],
+            "c": [2, 0, 1, 2, 0, 1],
+            "weight": [3, 5, 2, 1, 2, -2],
+        }
+    )
+    with pytest.raises(ValueError, match=r"column 'count' is missing in the DataFrame"):
+        sum_weights_by_group(frame, weight_col="count")
