@@ -44,7 +44,7 @@ dev = [
     "pre-commit >=4.2,<5.0",
     "pygments >=2.19,<3.0",
     "pytest >=8.3,<9.0",
-    "pytest-cov >=6,<7",
+    "pytest-cov >=7,<8",
     "pytest-timeout >=2.4,<3.0",
     "ruff >=0.12,<1.0",
     "xdoctest >=1.2,<2.0",
@@ -55,6 +55,10 @@ docs = [
     "mkdocs-material >=9.5,<10.0",
     "mkdocstrings[python] >=0.29,<1.0",
 ]
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
 
 [tool.uv.pip]
 torch-backend = "auto"
