@@ -13,9 +13,12 @@ from votingsys.utils.dataframe import (
     check_column_exist,
     remove_zero_weight_rows,
     sum_weights_by_group,
+    weighted_value_count,
 )
+from votingsys.utils.mapping import find_max_in_mapping
 from votingsys.vote.base import (
     BaseVote,
+    WinnerNotFoundError,
 )
 
 if TYPE_CHECKING:
@@ -107,15 +110,21 @@ class RankedVote(BaseVote):
 
         >>> import polars as pl
         >>> from votingsys.vote import RankedVote
-        >>> vote = RankedVote(
-        ...     pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 5, 2]}),
-        ...     count_col="count",
+        >>> vote = RankedVote.from_count_dataframe(
+        ...     pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]}),
         ... )
         >>> vote.absolute_majority_winner()
-        'b'
+        'c'
 
         ```
         """
+        counts = weighted_value_count(self._ranking, value=0, weight_col=self._count_col)
+        candidates, max_votes = find_max_in_mapping(counts)
+        total_votes = self.get_num_voters()
+        if max_votes / total_votes > 0.5:
+            return candidates[0]
+        msg = "No winner found using absolute majority rule"
+        raise WinnerNotFoundError(msg)
 
     @classmethod
     def from_dataframe(cls, frame: pl.DataFrame, count_col: str = "count") -> RankedVote:
