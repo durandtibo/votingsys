@@ -15,7 +15,7 @@ def compute_count_aggregated_dataframe(
     r"""Compute a count aggregated DataFrame.
 
     Args:
-        frame: The DataFrame to compute a aggregated version.
+        frame: The DataFrame to compute an aggregated version.
         count_col: The name of the colum that contains the count
             values. This name cannot exist in the DataFrame.
 
@@ -42,7 +42,7 @@ def compute_count_aggregated_dataframe(
     ┌─────┬─────┬─────┬───────┐
     │ a   ┆ b   ┆ c   ┆ count │
     │ --- ┆ --- ┆ --- ┆ ---   │
-    │ i64 ┆ i64 ┆ i64 ┆ u32   │
+    │ i64 ┆ i64 ┆ i64 ┆ i64   │
     ╞═════╪═════╪═════╪═══════╡
     │ 0   ┆ 1   ┆ 2   ┆ 3     │
     │ 1   ┆ 2   ┆ 0   ┆ 2     │
@@ -54,6 +54,6 @@ def compute_count_aggregated_dataframe(
     check_column_missing(frame, col=count_col)
     return (
         frame.group_by(frame.columns)
-        .agg(pl.len().alias(count_col))
+        .agg(pl.len().cast(pl.Int64).alias(count_col))
         .sort(by=count_col, descending=True)
     )
