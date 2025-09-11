@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 from coola import objects_are_equal
 
+from votingsys.data.aggregation import compute_count_aggregated_dataframe
 from votingsys.utils.dataframe import check_column_exist
 from votingsys.vote.base import (
     BaseVote,
@@ -59,6 +60,11 @@ class RankedVote(BaseVote):
             f"num_voters={self.get_num_voters():,}, count_col={self._count_col!r})"
         )
 
+    @property
+    def ranking(self) -> pl.DataFrame:
+        r"""Return the DataFrame containing the rankings."""
+        return self._ranking
+
     def equal(self, other: Any, equal_nan: bool = False) -> bool:
         if not isinstance(other, self.__class__):
             return False
@@ -96,3 +102,54 @@ class RankedVote(BaseVote):
 
         ```
         """
+
+    @classmethod
+    def from_dataframe(cls, frame: pl.DataFrame, count_col: str = "count") -> RankedVote:
+        r"""Instantiate a ``RankedVote`` object from a
+        ``polars.DataFrame`` containing the ranking.
+
+        Internally, ``RankedVote`` uses a compressed DataFrame with
+        the number of occurrences for each ranking. For example if the
+        same ranking is ``N`` times in the DataFrame, it will be
+        re-encoded as a single row with a count of ``N``.
+        The "compressed" representation is more efficient because the
+        new DataFrame can be much smaller.
+
+        Args:
+            frame: The DataFrame with the ranking for each voter.
+            count_col: The column that will contain the count values
+                for each ranking.
+
+        Example usage:
+
+        ```pycon
+
+        >>> import polars as pl
+        >>> from votingsys.vote import RankedVote
+        >>> vote = RankedVote.from_dataframe(
+        ...     pl.DataFrame(
+        ...         {"a": [0, 1, 2, 1, 0, 0], "b": [1, 2, 0, 2, 1, 1], "c": [2, 0, 1, 0, 2, 2]}
+        ...     )
+        ... )
+        >>> vote
+        RankedVote(num_candidates=3, num_voters=6, count_col='count')
+        >>> vote.ranking
+        shape: (3, 4)
+        ┌─────┬─────┬─────┬───────┐
+        │ a   ┆ b   ┆ c   ┆ count │
+        │ --- ┆ --- ┆ --- ┆ ---   │
+        │ i64 ┆ i64 ┆ i64 ┆ i64   │
+        ╞═════╪═════╪═════╪═══════╡
+        │ 0   ┆ 1   ┆ 2   ┆ 3     │
+        │ 1   ┆ 2   ┆ 0   ┆ 2     │
+        │ 2   ┆ 0   ┆ 1   ┆ 1     │
+        └─────┴─────┴─────┴───────┘
+
+        ```
+        """
+        return cls(
+            ranking=compute_count_aggregated_dataframe(frame, count_col=count_col).sort(
+                by=count_col, descending=True
+            ),
+            count_col=count_col,
+        )
