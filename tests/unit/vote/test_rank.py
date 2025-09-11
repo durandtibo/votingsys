@@ -150,3 +150,39 @@ def test_ranked_vote_from_dataframe_count_col_exist() -> None:
             ),
             count_col="c",
         )
+
+
+def test_ranked_vote_from_count_dataframe() -> None:
+    assert RankedVote.from_count_dataframe(
+        pl.DataFrame(
+            {
+                "a": [0, 1, 2, 0, 2],
+                "b": [1, 2, 0, 1, 1],
+                "c": [2, 0, 1, 2, 0],
+                "count": [3, 5, 2, 1, 0],
+            }
+        ),
+    ).equal(
+        RankedVote(
+            pl.DataFrame({"a": [1, 0, 2], "b": [2, 1, 0], "c": [0, 2, 1], "count": [5, 4, 2]})
+        )
+    )
+
+
+def test_ranked_vote_from_count_dataframe_count_col() -> None:
+    assert RankedVote.from_count_dataframe(
+        pl.DataFrame(
+            {
+                "a": [0, 1, 2, 0, 2],
+                "b": [1, 2, 0, 1, 1],
+                "c": [2, 0, 1, 2, 0],
+                "#n": [3, 5, 2, 1, 0],
+            }
+        ),
+        count_col="#n",
+    ).equal(
+        RankedVote(
+            pl.DataFrame({"a": [1, 0, 2], "b": [2, 1, 0], "c": [0, 2, 1], "#n": [5, 4, 2]}),
+            count_col="#n",
+        )
+    )

@@ -9,7 +9,11 @@ from typing import TYPE_CHECKING, Any
 from coola import objects_are_equal
 
 from votingsys.data.aggregation import compute_count_aggregated_dataframe
-from votingsys.utils.dataframe import check_column_exist
+from votingsys.utils.dataframe import (
+    check_column_exist,
+    remove_zero_weight_rows,
+    sum_weights_by_group,
+)
 from votingsys.vote.base import (
     BaseVote,
 )
@@ -40,11 +44,21 @@ class RankedVote(BaseVote):
     >>> import polars as pl
     >>> from votingsys.vote import RankedVote
     >>> vote = RankedVote(
-    ...     pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 5, 2]}),
-    ...     count_col="count",
+    ...     pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 5, 2]})
     ... )
     >>> vote
     RankedVote(num_candidates=3, num_voters=10, count_col='count')
+    >>> vote.ranking
+    shape: (3, 4)
+    ┌─────┬─────┬─────┬───────┐
+    │ a   ┆ b   ┆ c   ┆ count │
+    │ --- ┆ --- ┆ --- ┆ ---   │
+    │ i64 ┆ i64 ┆ i64 ┆ i64   │
+    ╞═════╪═════╪═════╪═══════╡
+    │ 0   ┆ 1   ┆ 2   ┆ 3     │
+    │ 1   ┆ 2   ┆ 0   ┆ 5     │
+    │ 2   ┆ 0   ┆ 1   ┆ 2     │
+    └─────┴─────┴─────┴───────┘
 
     ```
     """
@@ -147,9 +161,56 @@ class RankedVote(BaseVote):
 
         ```
         """
+        return cls.from_count_dataframe(
+            ranking=compute_count_aggregated_dataframe(frame, count_col=count_col),
+            count_col=count_col,
+        )
+
+    @classmethod
+    def from_count_dataframe(cls, ranking: pl.DataFrame, count_col: str = "count") -> RankedVote:
+        r"""Instantiate a ``RankedVote`` object from a
+        ``polars.DataFrame`` containing the ranking.
+
+        Args:
+            ranking: The DataFrame with the ranking for each voter.
+            count_col: The column that will contain the count values
+                for each ranking.
+
+        Example usage:
+
+        ```pycon
+
+        >>> import polars as pl
+        >>> from votingsys.vote import RankedVote
+        >>> vote = RankedVote.from_count_dataframe(
+        ...     pl.DataFrame(
+        ...         {
+        ...             "a": [0, 1, 2, 0, 2],
+        ...             "b": [1, 2, 0, 1, 1],
+        ...             "c": [2, 0, 1, 2, 0],
+        ...             "count": [3, 5, 2, 1, 0],
+        ...         }
+        ...     ),
+        ... )
+        >>> vote
+        RankedVote(num_candidates=3, num_voters=11, count_col='count')
+        >>> vote.ranking
+        shape: (3, 4)
+        ┌─────┬─────┬─────┬───────┐
+        │ a   ┆ b   ┆ c   ┆ count │
+        │ --- ┆ --- ┆ --- ┆ ---   │
+        │ i64 ┆ i64 ┆ i64 ┆ i64   │
+        ╞═════╪═════╪═════╪═══════╡
+        │ 1   ┆ 2   ┆ 0   ┆ 5     │
+        │ 0   ┆ 1   ┆ 2   ┆ 4     │
+        │ 2   ┆ 0   ┆ 1   ┆ 2     │
+        └─────┴─────┴─────┴───────┘
+
+        ```
+        """
         return cls(
-            ranking=compute_count_aggregated_dataframe(frame, count_col=count_col).sort(
-                by=count_col, descending=True
-            ),
+            ranking=remove_zero_weight_rows(
+                sum_weights_by_group(ranking, weight_col=count_col), weight_col=count_col
+            ).sort(by=count_col, descending=True),
             count_col=count_col,
         )
