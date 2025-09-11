@@ -24,7 +24,7 @@ def test_compute_count_aggregated_dataframe() -> None:
         ),
         pl.DataFrame(
             {"a": [2, 1, 0], "b": [1, 0, 1], "c": [0, 2, 2], "count": [7, 5, 2]},
-            schema={"a": pl.Int64, "b": pl.Int64, "c": pl.Int64, "count": pl.UInt32},
+            schema={"a": pl.Int64, "b": pl.Int64, "c": pl.Int64, "count": pl.Int64},
         ),
     )
 
@@ -38,7 +38,7 @@ def test_compute_count_aggregated_dataframe_empty() -> None:
         ),
         pl.DataFrame(
             {"a": [], "b": [], "c": [], "count": []},
-            schema={"a": pl.Int64, "b": pl.Int64, "c": pl.Int64, "count": pl.UInt32},
+            schema={"a": pl.Int64, "b": pl.Int64, "c": pl.Int64, "count": pl.Int64},
         ),
     )
 
@@ -58,7 +58,7 @@ def test_compute_count_aggregated_dataframe_count_col() -> None:
         ),
         pl.DataFrame(
             {"a": [2, 1, 0], "b": [1, 0, 1], "c": [0, 2, 2], "#count": [7, 5, 2]},
-            schema={"a": pl.Int64, "b": pl.Int64, "c": pl.Int64, "#count": pl.UInt32},
+            schema={"a": pl.Int64, "b": pl.Int64, "c": pl.Int64, "#count": pl.Int64},
         ),
     )
 
