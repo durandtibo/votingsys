@@ -6,6 +6,7 @@ from coola import objects_are_equal
 
 from votingsys.vote import (
     RankedVote,
+    WinnerNotFoundError,
 )
 
 ################################
@@ -102,6 +103,29 @@ def test_ranked_vote_get_num_voters_2() -> None:
         ).get_num_voters()
         == 11
     )
+
+
+def test_ranked_vote_absolute_majority_winner() -> None:
+    assert (
+        RankedVote(
+            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
+        ).absolute_majority_winner()
+        == "c"
+    )
+
+
+def test_ranked_vote_absolute_majority_winner_no_absolute_majority() -> None:
+    with pytest.raises(WinnerNotFoundError, match=r"No winner found using absolute majority rule"):
+        RankedVote(
+            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 5, 2]})
+        ).absolute_majority_winner()
+
+
+def test_ranked_vote_absolute_majority_winner_no_majority() -> None:
+    with pytest.raises(WinnerNotFoundError, match=r"No winner found using absolute majority rule"):
+        RankedVote(
+            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 4, 2]})
+        ).absolute_majority_winner()
 
 
 def test_ranked_vote_from_dataframe() -> None:
