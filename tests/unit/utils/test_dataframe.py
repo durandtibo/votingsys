@@ -7,6 +7,7 @@ from coola import objects_are_equal
 from votingsys.utils.dataframe import (
     check_column_exist,
     check_column_missing,
+    remove_zero_weight_rows,
     sum_weights_by_group,
     value_count,
     weighted_value_count,
@@ -188,6 +189,75 @@ def test_weighted_value_count_float_weight(value: int, counts: dict) -> None:
 def test_weighted_value_count_empty() -> None:
     with pytest.raises(ValueError, match=r"column 'count' is missing in the DataFrame"):
         weighted_value_count(pl.DataFrame(), value=1, weight_col="count")
+
+
+#############################################
+#     Tests for remove_zero_weight_rows     #
+#############################################
+
+
+def test_remove_zero_weight_rows() -> None:
+    assert objects_are_equal(
+        remove_zero_weight_rows(
+            pl.DataFrame(
+                {
+                    "a": [0, 1, 2, 2, 0],
+                    "b": [1, 2, 0, 1, 2],
+                    "c": [2, 0, 1, 0, 1],
+                    "weight": [3, 0, 2, 1, 0],
+                }
+            ),
+            weight_col="weight",
+        ),
+        pl.DataFrame({"a": [0, 2, 2], "b": [1, 0, 1], "c": [2, 1, 0], "weight": [3, 2, 1]}),
+    )
+
+
+def test_remove_zero_weight_rows_empty() -> None:
+    assert objects_are_equal(
+        remove_zero_weight_rows(
+            pl.DataFrame({"a": [], "b": [], "c": [], "weight": []}),
+            weight_col="weight",
+        ),
+        pl.DataFrame({"a": [], "b": [], "c": [], "weight": []}),
+    )
+
+
+def test_remove_zero_weight_rows_no_zeros() -> None:
+    assert objects_are_equal(
+        remove_zero_weight_rows(
+            pl.DataFrame(
+                {
+                    "a": [0, 1, 2, 2, 0],
+                    "b": [1, 2, 0, 1, 2],
+                    "c": [2, 0, 1, 0, 1],
+                    "weight": [3, 5, 2, 1, 7],
+                }
+            ),
+            weight_col="weight",
+        ),
+        pl.DataFrame(
+            {
+                "a": [0, 1, 2, 2, 0],
+                "b": [1, 2, 0, 1, 2],
+                "c": [2, 0, 1, 0, 1],
+                "weight": [3, 5, 2, 1, 7],
+            }
+        ),
+    )
+
+
+def test_remove_zero_weight_rows_missing_column() -> None:
+    frame = pl.DataFrame(
+        {
+            "a": [0, 1, 2, 2, 0],
+            "b": [1, 2, 0, 1, 2],
+            "c": [2, 0, 1, 0, 1],
+            "weight": [3, 0, 2, 1, 0],
+        }
+    )
+    with pytest.raises(ValueError, match=r"column 'count' is missing in the DataFrame"):
+        remove_zero_weight_rows(frame, weight_col="count")
 
 
 ##########################################
