@@ -176,8 +176,8 @@ def test_ranked_vote_from_dataframe_count_col_exist() -> None:
         )
 
 
-def test_ranked_vote_from_count_dataframe() -> None:
-    assert RankedVote.from_count_dataframe(
+def test_ranked_vote_from_dataframe_with_count() -> None:
+    assert RankedVote.from_dataframe_with_count(
         pl.DataFrame(
             {
                 "a": [0, 1, 2, 0, 2],
@@ -193,8 +193,8 @@ def test_ranked_vote_from_count_dataframe() -> None:
     )
 
 
-def test_ranked_vote_from_count_dataframe_count_col() -> None:
-    assert RankedVote.from_count_dataframe(
+def test_ranked_vote_from_dataframe_with_count_count_col() -> None:
+    assert RankedVote.from_dataframe_with_count(
         pl.DataFrame(
             {
                 "a": [0, 1, 2, 0, 2],
