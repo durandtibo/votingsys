@@ -5,6 +5,7 @@ from __future__ import annotations
 __all__ = [
     "check_column_exist",
     "check_column_missing",
+    "remove_zero_weight_rows",
     "sum_weights_by_group",
     "value_count",
     "weighted_value_count",
@@ -170,6 +171,56 @@ def weighted_value_count(
         ]
     ).to_dict(as_series=False)
     return {key: value[0] for key, value in counts.items()}
+
+
+def remove_zero_weight_rows(frame: pl.DataFrame, weight_col: str) -> pl.DataFrame:
+    """Remove all rows from a DataFrame where the weight value is zero.
+
+    Args:
+        frame: The input DataFrame from which rows should be filtered.
+        weight_col:  The name of the column that contains the weight
+            values.
+
+    Returns:
+        A new DataFrame with all rows removed where the weight is zero.
+
+    Raises:
+        ValueError: if ``weight_col`` does not exist in the DataFrame.
+
+    Example usage:
+
+    ```pycon
+
+    >>> import polars as pl
+    >>> from votingsys.utils.dataframe import remove_zero_weight_rows
+    >>> out = remove_zero_weight_rows(
+    ...     pl.DataFrame(
+    ...         {
+    ...             "a": [0, 1, 2, 0, 1, 2],
+    ...             "b": [1, 2, 0, 1, 2, 0],
+    ...             "c": [2, 0, 1, 2, 0, 1],
+    ...             "weight": [3, 0, 2, 1, 2, 0],
+    ...         }
+    ...     ),
+    ...     weight_col="weight",
+    ... )
+    >>> out
+    shape: (4, 4)
+    ┌─────┬─────┬─────┬────────┐
+    │ a   ┆ b   ┆ c   ┆ weight │
+    │ --- ┆ --- ┆ --- ┆ ---    │
+    │ i64 ┆ i64 ┆ i64 ┆ i64    │
+    ╞═════╪═════╪═════╪════════╡
+    │ 0   ┆ 1   ┆ 2   ┆ 3      │
+    │ 2   ┆ 0   ┆ 1   ┆ 2      │
+    │ 0   ┆ 1   ┆ 2   ┆ 1      │
+    │ 1   ┆ 2   ┆ 0   ┆ 2      │
+    └─────┴─────┴─────┴────────┘
+
+    ```
+    """
+    check_column_exist(frame, weight_col)
+    return frame.filter(pl.col(weight_col) != 0)
 
 
 def sum_weights_by_group(frame: pl.DataFrame, weight_col: str) -> pl.DataFrame:
