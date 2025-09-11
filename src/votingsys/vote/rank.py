@@ -110,7 +110,7 @@ class RankedVote(BaseVote):
 
         >>> import polars as pl
         >>> from votingsys.vote import RankedVote
-        >>> vote = RankedVote.from_count_dataframe(
+        >>> vote = RankedVote.from_dataframe_with_count(
         ...     pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]}),
         ... )
         >>> vote.absolute_majority_winner()
@@ -170,20 +170,26 @@ class RankedVote(BaseVote):
 
         ```
         """
-        return cls.from_count_dataframe(
+        return cls.from_dataframe_with_count(
             ranking=compute_count_aggregated_dataframe(frame, count_col=count_col),
             count_col=count_col,
         )
 
     @classmethod
-    def from_count_dataframe(cls, ranking: pl.DataFrame, count_col: str = "count") -> RankedVote:
+    def from_dataframe_with_count(
+        cls, ranking: pl.DataFrame, count_col: str = "count"
+    ) -> RankedVote:
         r"""Instantiate a ``RankedVote`` object from a
-        ``polars.DataFrame`` containing the ranking.
+        ``polars.DataFrame`` containing the rankings and their
+        associated counts.
 
         Args:
-            ranking: The DataFrame with the ranking for each voter.
-            count_col: The column that will contain the count values
-                for each ranking.
+            ranking: A DataFrame with the ranking for each voters. Each
+                column represents a candidate, and each row is a voter
+                ranking. The ranking goes from ``0`` to ``n-1``, where
+                ``n`` is the number of candidates. One column contains
+                the number of voters for this ranking.
+            count_col: The column with the count data for each ranking.
 
         Example usage:
 
@@ -191,7 +197,7 @@ class RankedVote(BaseVote):
 
         >>> import polars as pl
         >>> from votingsys.vote import RankedVote
-        >>> vote = RankedVote.from_count_dataframe(
+        >>> vote = RankedVote.from_dataframe_with_count(
         ...     pl.DataFrame(
         ...         {
         ...             "a": [0, 1, 2, 0, 2],
