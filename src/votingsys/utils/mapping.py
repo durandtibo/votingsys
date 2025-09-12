@@ -7,10 +7,10 @@ __all__ = ["find_max_in_mapping"]
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import Hashable, Mapping
+    from collections.abc import Mapping
 
 
-def find_max_in_mapping(mapping: Mapping[Hashable, float]) -> tuple[tuple[Hashable, ...], float]:
+def find_max_in_mapping(mapping: Mapping[str, float]) -> tuple[tuple[str, ...], float]:
     """Find the maximum value in a mapping and returns the corresponding
     key(s) and the value.
 
