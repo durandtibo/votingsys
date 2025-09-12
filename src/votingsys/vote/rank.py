@@ -127,7 +127,7 @@ class RankedVote(BaseVote):
         raise WinnerNotFoundError(msg)
 
     @classmethod
-    def from_dataframe(cls, frame: pl.DataFrame, count_col: str = "count") -> RankedVote:
+    def from_dataframe(cls, ranking: pl.DataFrame, count_col: str = "count") -> RankedVote:
         r"""Instantiate a ``RankedVote`` object from a
         ``polars.DataFrame`` containing the ranking.
 
@@ -139,7 +139,7 @@ class RankedVote(BaseVote):
         new DataFrame can be much smaller.
 
         Args:
-            frame: The DataFrame with the ranking for each voter.
+            ranking: The DataFrame with the ranking for each voter.
             count_col: The column that will contain the count values
                 for each ranking.
 
@@ -171,7 +171,7 @@ class RankedVote(BaseVote):
         ```
         """
         return cls.from_dataframe_with_count(
-            ranking=compute_count_aggregated_dataframe(frame, count_col=count_col),
+            ranking=compute_count_aggregated_dataframe(ranking, count_col=count_col),
             count_col=count_col,
         )
 
