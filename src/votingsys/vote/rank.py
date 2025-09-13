@@ -292,9 +292,10 @@ class RankedVote(BaseVote):
 
         ```
         """
+        cols = [count_col, *sorted([col for col in ranking.columns if col != count_col])]
         return cls(
             ranking=remove_zero_weight_rows(
                 sum_weights_by_group(ranking, weight_col=count_col), weight_col=count_col
-            ).sort(by=count_col, descending=True),
+            ).sort(by=cols, descending=True),
             count_col=count_col,
         )
