@@ -126,6 +126,42 @@ class RankedVote(BaseVote):
         msg = "No winner found using absolute majority rule"
         raise WinnerNotFoundError(msg)
 
+    def plurality_winners(self) -> tuple[str, ...]:
+        r"""Compute the winner based on the plurality rule.
+
+        This rule is also named First-Past-The-Post (FPTP).
+        The leading candidate, whether or not they have a majority of votes, is the winner.
+
+        Returns:
+            The winners based on the plurality rule. Multiple winners
+                can be returned if the leading candidates are tied.
+                The candiates are sorted by alphabetical order.
+
+        Example usage:
+
+        ```pycon
+
+        >>> import polars as pl
+        >>> from votingsys.vote import RankedVote
+        >>> vote = RankedVote.from_dataframe_with_count(
+        ...     pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]}),
+        ... )
+        >>> vote.plurality_winners()
+        ('c',)
+        >>> vote = RankedVote.from_dataframe_with_count(
+        ...     pl.DataFrame(
+        ...         {"a": [0, 1, 2, 1], "b": [1, 2, 0, 0], "c": [2, 0, 1, 2], "count": [3, 6, 2, 4]}
+        ...     ),
+        ... )
+        >>> vote.plurality_winners()
+        ('b', 'c')
+
+        ```
+        """
+        counts = weighted_value_count(self._ranking, value=0, weight_col=self._count_col)
+        candidates, _ = find_max_in_mapping(counts)
+        return tuple(sorted(candidates))
+
     @classmethod
     def from_dataframe(cls, ranking: pl.DataFrame, count_col: str = "count") -> RankedVote:
         r"""Instantiate a ``RankedVote`` object from a

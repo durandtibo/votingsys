@@ -128,6 +128,24 @@ def test_ranked_vote_absolute_majority_winner_no_majority() -> None:
         ).absolute_majority_winner()
 
 
+def test_ranked_vote_plurality_winners_one() -> None:
+    assert RankedVote(
+        pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
+    ).plurality_winners() == ("c",)
+
+
+def test_ranked_vote_plurality_winners_two() -> None:
+    assert RankedVote(
+        pl.DataFrame(
+            {"a": [0, 1, 2, 1], "b": [1, 2, 0, 0], "c": [2, 0, 1, 2], "count": [3, 6, 2, 4]}
+        )
+    ).plurality_winners() == ("b", "c")
+
+
+def test_ranked_vote_plurality_winners_one_candidate() -> None:
+    assert RankedVote(pl.DataFrame({"a": [0], "count": [6]})).plurality_winners() == ("a",)
+
+
 def test_ranked_vote_from_dataframe() -> None:
     assert RankedVote.from_dataframe(
         pl.DataFrame(
