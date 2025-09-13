@@ -254,3 +254,44 @@ def test_ranked_vote_from_dataframe_with_count_count_col() -> None:
             count_col="#n",
         )
     )
+
+
+###################################################################################################
+# Candy election example
+# https://coconino.edu/resources/files/pdfs/academics/arts-and-sciences/MAT142/Chapter_7_VotingSystems.pdf
+###################################################################################################
+
+
+@pytest.fixture
+def candy_election() -> pl.DataFrame:
+    return pl.DataFrame(
+        {
+            "C": [1, 2, 0, 0, 2],
+            "M": [0, 0, 1, 2, 1],
+            "S": [2, 1, 2, 1, 0],
+            "count": [3, 1, 4, 1, 9],
+        }
+    )
+
+
+@pytest.fixture
+def candy_election_votes() -> pl.DataFrame:
+    return pl.DataFrame(
+        {
+            "C": [0, 2, 0, 1, 2, 2, 2, 2, 2, 1, 0, 1, 2, 2, 0, 0, 2, 2],
+            "M": [2, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
+            "S": [1, 1, 2, 2, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 0],
+        }
+    )
+
+
+def test_candy_election_data_preparation(
+    candy_election_votes: pl.DataFrame, candy_election: pl.DataFrame
+) -> None:
+    assert RankedVote.from_dataframe(candy_election_votes).equal(
+        RankedVote.from_dataframe_with_count(candy_election)
+    )
+
+
+def test_candy_election_plurality_winner(candy_election: pl.DataFrame) -> None:
+    assert RankedVote(candy_election).plurality_winner() == "S"
