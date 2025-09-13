@@ -12,6 +12,7 @@ from coola.utils.format import repr_indent, repr_mapping
 
 from votingsys.utils.counter import check_non_empty_count, check_non_negative_count
 from votingsys.utils.dataframe import check_column_exist
+from votingsys.utils.mapping import find_max_in_mapping
 from votingsys.vote.base import (
     BaseVote,
     MultipleWinnersFoundError,
@@ -196,9 +197,7 @@ class SingleMarkVote(BaseVote):
 
         ```
         """
-        max_count = max(self._counter.values())
-        max_candidates = [cand for cand, count in self._counter.items() if count == max_count]
-        return tuple(sorted(max_candidates))
+        return tuple(sorted(find_max_in_mapping(self._counter)[0]))
 
     @classmethod
     def from_sequence(cls, votes: Sequence[str]) -> SingleMarkVote:
