@@ -179,6 +179,7 @@ class SingleMarkVote(BaseVote):
         Returns:
             The winners based on the plurality rule. Multiple winners
                 can be returned if the leading candidates are tied.
+                The candiates are sorted by alphabetical order.
 
         Example usage:
 
@@ -189,6 +190,9 @@ class SingleMarkVote(BaseVote):
         >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
         >>> vote.plurality_winners()
         ('a',)
+        >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 10}))
+        >>> vote.plurality_winners()
+        ('a', 'd')
 
         ```
         """
