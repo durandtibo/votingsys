@@ -5,6 +5,7 @@ import pytest
 from coola import objects_are_equal
 
 from votingsys.vote import (
+    MultipleWinnersFoundError,
     RankedVote,
     WinnerNotFoundError,
 )
@@ -128,13 +129,38 @@ def test_ranked_vote_absolute_majority_winner_no_majority() -> None:
         ).absolute_majority_winner()
 
 
-def test_ranked_vote_plurality_winners_one() -> None:
+def test_ranked_vote_plurality_winner() -> None:
+    assert (
+        RankedVote(
+            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
+        ).plurality_winner()
+        == "c"
+    )
+
+
+def test_ranked_vote_plurality_winner_tie() -> None:
+    vote = RankedVote(
+        pl.DataFrame(
+            {"a": [0, 1, 2, 1], "b": [1, 2, 0, 0], "c": [2, 0, 1, 2], "count": [3, 6, 2, 4]}
+        )
+    )
+    with pytest.raises(
+        MultipleWinnersFoundError, match=r"Multiple winners found using plurality rule:"
+    ):
+        vote.plurality_winner()
+
+
+def test_ranked_vote_plurality_winner_1_candidate() -> None:
+    assert RankedVote(pl.DataFrame({"a": [0], "count": [6]})).plurality_winner() == "a"
+
+
+def test_ranked_vote_plurality_winners() -> None:
     assert RankedVote(
         pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
     ).plurality_winners() == ("c",)
 
 
-def test_ranked_vote_plurality_winners_two() -> None:
+def test_ranked_vote_plurality_winners_multiple() -> None:
     assert RankedVote(
         pl.DataFrame(
             {"a": [0, 1, 2, 1], "b": [1, 2, 0, 0], "c": [2, 0, 1, 2], "count": [3, 6, 2, 4]}

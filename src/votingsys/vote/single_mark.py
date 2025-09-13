@@ -171,7 +171,7 @@ class SingleMarkVote(BaseVote):
         return winners[0]
 
     def plurality_winners(self) -> tuple[str, ...]:
-        r"""Compute the winner based on the plurality rule.
+        r"""Compute the winner(s) based on the plurality rule.
 
         This rule is also named First-Past-The-Post (FPTP).
         The leading candidate, whether or not they have a majority of votes, is the winner.

@@ -18,6 +18,7 @@ from votingsys.utils.dataframe import (
 from votingsys.utils.mapping import find_max_in_mapping
 from votingsys.vote.base import (
     BaseVote,
+    MultipleWinnersFoundError,
     WinnerNotFoundError,
 )
 
@@ -126,8 +127,40 @@ class RankedVote(BaseVote):
         msg = "No winner found using absolute majority rule"
         raise WinnerNotFoundError(msg)
 
-    def plurality_winners(self) -> tuple[str, ...]:
+    def plurality_winner(self) -> str:
         r"""Compute the winner based on the plurality rule.
+
+        This rule is also named First-Past-The-Post (FPTP).
+        The leading candidate, whether or not they have a majority of votes, is the winner.
+
+        Returns:
+            The winner based on the plurality rule.
+
+        Raises:
+            MultipleWinnersFoundError: if the leading candidates are tied.
+
+        Example usage:
+
+        ```pycon
+
+        >>> import polars as pl
+        >>> from votingsys.vote import RankedVote
+        >>> vote = RankedVote.from_dataframe_with_count(
+        ...     pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]}),
+        ... )
+        >>> vote.plurality_winner()
+        'c'
+
+        ```
+        """
+        winners = self.plurality_winners()
+        if len(winners) > 1:
+            msg = f"Multiple winners found using plurality rule: {winners}"
+            raise MultipleWinnersFoundError(msg)
+        return winners[0]
+
+    def plurality_winners(self) -> tuple[str, ...]:
+        r"""Compute the winner(s) based on the plurality rule.
 
         This rule is also named First-Past-The-Post (FPTP).
         The leading candidate, whether or not they have a majority of votes, is the winner.
