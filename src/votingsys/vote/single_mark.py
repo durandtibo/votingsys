@@ -72,6 +72,26 @@ class SingleMarkVote(BaseVote):
     def get_num_voters(self) -> int:
         return self._counter.total()
 
+    def get_candidates(self) -> tuple[str, ...]:
+        r"""Get the candidate names.
+
+        Returns:
+            The candidate names sorted by alphabetical order.
+
+        Example usage:
+
+        ```pycon
+
+        >>> from collections import Counter
+        >>> from votingsys.vote import SingleMarkVote
+        >>> vote = SingleMarkVote(Counter({"a": 10, "b": 20, "c": 5, "d": 3}))
+        >>> vote.get_candidates()
+        ('a', 'b', 'c', 'd')
+
+        ```
+        """
+        return tuple(sorted(self._counter.keys()))
+
     def absolute_majority_winner(self) -> str:
         r"""Compute the winner based on the absolute majority rule.
 
