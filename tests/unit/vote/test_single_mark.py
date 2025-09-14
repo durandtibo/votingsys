@@ -66,6 +66,13 @@ def test_single_mark_vote_get_num_voters_2() -> None:
     assert SingleMarkVote(Counter({"a": 10, "b": 2})).get_num_voters() == 12
 
 
+def test_single_mark_vote_get_candidates() -> None:
+    assert objects_are_equal(
+        SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3})).get_candidates(),
+        ("a", "b", "c", "d"),
+    )
+
+
 def test_single_mark_vote_absolute_majority_winner_majority() -> None:
     assert (
         SingleMarkVote(Counter({"a": 10, "b": 20, "c": 5, "d": 3})).absolute_majority_winner()

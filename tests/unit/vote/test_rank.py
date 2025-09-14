@@ -63,6 +63,10 @@ def test_ranked_vote_get_num_candidates(ranking: pl.DataFrame) -> None:
     assert RankedVote(ranking).get_num_candidates() == 3
 
 
+def test_ranked_vote_get_candidates(ranking: pl.DataFrame) -> None:
+    assert objects_are_equal(RankedVote(ranking).get_candidates(), ("a", "b", "c"))
+
+
 def test_ranked_vote_get_num_candidates_2() -> None:
     assert (
         RankedVote(

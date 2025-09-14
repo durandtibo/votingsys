@@ -97,6 +97,28 @@ class RankedVote(BaseVote):
     def get_num_voters(self) -> int:
         return self._ranking[self._count_col].sum()
 
+    def get_candidates(self) -> tuple[str, ...]:
+        r"""Get the candidate names.
+
+        Returns:
+            The candidate names sorted by alphabetical order.
+
+        Example usage:
+
+        ```pycon
+
+        >>> import polars as pl
+        >>> from votingsys.vote import RankedVote
+        >>> vote = RankedVote.from_dataframe_with_count(
+        ...     pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]}),
+        ... )
+        >>> vote.get_candidates()
+        ('a', 'b', 'c')
+
+        ```
+        """
+        return tuple(sorted([col for col in self._ranking.columns if col != self._count_col]))
+
     def absolute_majority_winner(self) -> str:
         r"""Compute the winner based on the absolute majority rule.
 
@@ -122,8 +144,7 @@ class RankedVote(BaseVote):
 
         ```
         """
-        counts = weighted_value_count(self._ranking, value=0, weight_col=self._count_col)
-        candidates, max_votes = find_max_in_mapping(counts)
+        candidates, max_votes = find_max_in_mapping(self.plurality_counts())
         total_votes = self.get_num_voters()
         if max_votes / total_votes > 0.5:
             return candidates[0]
