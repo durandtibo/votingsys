@@ -424,8 +424,20 @@ def test_candy_election_absolute_majority_winner(candy_election: pl.DataFrame) -
         RankedVote.from_dataframe_with_count(candy_election).absolute_majority_winner()
 
 
+def test_candy_election_borda_counts(candy_election: pl.DataFrame) -> None:
+    assert objects_are_equal(
+        RankedVote(candy_election).borda_counts(), {"C": 31.0, "M": 39.0, "S": 38.0}
+    )
+
+
 def test_candy_election_borda_count_winner(candy_election: pl.DataFrame) -> None:
     assert RankedVote(candy_election).borda_count_winner() == "M"
+
+
+def test_candy_election_plurality_counts(candy_election: pl.DataFrame) -> None:
+    assert objects_are_equal(
+        RankedVote(candy_election).plurality_counts(), {"C": 5, "M": 4, "S": 9}
+    )
 
 
 def test_candy_election_plurality_winner(candy_election: pl.DataFrame) -> None:
