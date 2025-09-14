@@ -206,6 +206,22 @@ def test_ranked_vote_borda_count_winners_incorrect_points() -> None:
         vote.borda_count_winners(points=[4, 2])
 
 
+def test_ranked_vote_plurality_counts() -> None:
+    assert objects_are_equal(
+        RankedVote(
+            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
+        ).plurality_counts(),
+        {"a": 3, "b": 2, "c": 6},
+    )
+
+
+def test_ranked_vote_plurality_counts_one_candidate() -> None:
+    assert objects_are_equal(
+        RankedVote(pl.DataFrame({"a": [0, 0, 0], "count": [3, 6, 2]})).plurality_counts(),
+        {"a": 11},
+    )
+
+
 def test_ranked_vote_plurality_winner() -> None:
     assert (
         RankedVote(
