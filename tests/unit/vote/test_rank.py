@@ -130,6 +130,49 @@ def test_ranked_vote_absolute_majority_winner_no_majority() -> None:
         ).absolute_majority_winner()
 
 
+def test_ranked_vote_borda_count_winner() -> None:
+    assert (
+        RankedVote(
+            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
+        ).borda_count_winner()
+        == "c"
+    )
+
+
+def test_ranked_vote_borda_count_winner_multiple() -> None:
+    vote = RankedVote(
+        pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [2, 2, 2]})
+    )
+    with pytest.raises(
+        MultipleWinnersFoundError, match=r"Multiple winners found using Borda count rule:"
+    ):
+        vote.borda_count_winner()
+
+
+def test_ranked_vote_borda_count_winner_one_candidate() -> None:
+    assert RankedVote(pl.DataFrame({"a": [0], "count": [6]})).borda_count_winner() == "a"
+
+
+def test_ranked_vote_borda_count_winner_custom_points() -> None:
+    assert (
+        RankedVote(
+            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
+        ).borda_count_winner(points=[4, 2, 1])
+        == "c"
+    )
+
+
+def test_ranked_vote_borda_count_winner_incorrect_points() -> None:
+    vote = RankedVote(
+        pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
+    )
+    with pytest.raises(
+        ValueError,
+        match=r"The number of points \(2\) is different from the number of candidates \(3\)",
+    ):
+        vote.borda_count_winner(points=[4, 2])
+
+
 def test_ranked_vote_borda_count_winners() -> None:
     assert RankedVote(
         pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
@@ -373,6 +416,10 @@ def test_candy_election_data_preparation(
 def test_candy_election_absolute_majority_winner(candy_election: pl.DataFrame) -> None:
     with pytest.raises(WinnerNotFoundError, match=r"No winner found using absolute majority rule"):
         RankedVote.from_dataframe_with_count(candy_election).absolute_majority_winner()
+
+
+def test_candy_election_borda_count_winner(candy_election: pl.DataFrame) -> None:
+    assert RankedVote(candy_election).borda_count_winner() == "M"
 
 
 def test_candy_election_plurality_winner(candy_election: pl.DataFrame) -> None:
