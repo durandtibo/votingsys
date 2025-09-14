@@ -141,6 +141,28 @@ class SingleMarkVote(BaseVote):
         msg = f"No winner found using super majority rule with threshold={threshold}"
         raise WinnerNotFoundError(msg)
 
+    def plurality_counts(self) -> dict[str, int]:
+        r"""Compute the number of votes for each candidate.
+
+        Returns:
+            A dictionary with the number of votes for each candidate.
+                The key is the candidate and the value is the number
+                of votes.
+
+        Example usage:
+
+        ```pycon
+
+        >>> from collections import Counter
+        >>> from votingsys.vote import SingleMarkVote
+        >>> vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3}))
+        >>> vote.plurality_counts()
+        {'a': 10, 'b': 2, 'c': 5, 'd': 3}
+
+        ```
+        """
+        return dict(self._counter)
+
     def plurality_winner(self) -> str:
         r"""Compute the winner based on the plurality rule.
 

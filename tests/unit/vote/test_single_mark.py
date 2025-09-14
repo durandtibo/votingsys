@@ -4,6 +4,7 @@ from collections import Counter
 
 import polars as pl
 import pytest
+from coola import objects_are_equal
 
 from votingsys.vote import (
     MultipleWinnersFoundError,
@@ -103,6 +104,17 @@ def test_single_mark_vote_super_winner_invalid_threshold() -> None:
     vote = SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3, "e": 10}))
     with pytest.raises(ValueError, match=r"threshold must be >0.5 \(received 0.4\)"):
         vote.super_majority_winner(0.4)
+
+
+def test_single_mark_vote_plurality_counts() -> None:
+    assert objects_are_equal(
+        SingleMarkVote(Counter({"a": 10, "b": 2, "c": 5, "d": 3})).plurality_counts(),
+        {"a": 10, "b": 2, "c": 5, "d": 3},
+    )
+
+
+def test_single_mark_vote_plurality_counts_1_candidate() -> None:
+    assert objects_are_equal(SingleMarkVote(Counter({"a": 10})).plurality_counts(), {"a": 10})
 
 
 def test_single_mark_vote_plurality_winner() -> None:
