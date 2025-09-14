@@ -224,6 +224,31 @@ class RankedVote(BaseVote):
         candidates, _ = find_max_in_mapping(counts)
         return tuple(sorted(candidates))
 
+    def plurality_counts(self) -> dict[str, int]:
+        r"""Compute the plurality count for each candidate, i.e. the
+        number of voters who rank each candidate in first place.
+
+        Returns:
+            A dictionary with the count of votes for each candidate.
+                The key is the candidate and the value is the number
+                of votes.
+
+        Example usage:
+
+        ```pycon
+
+        >>> import polars as pl
+        >>> from votingsys.vote import RankedVote
+        >>> vote = RankedVote.from_dataframe_with_count(
+        ...     pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]}),
+        ... )
+        >>> vote.plurality_counts()
+        {'a': 3, 'b': 2, 'c': 6}
+
+        ```
+        """
+        return weighted_value_count(self._ranking, value=0, weight_col=self._count_col)
+
     def plurality_winner(self) -> str:
         r"""Compute the winner based on the plurality rule.
 
@@ -288,7 +313,7 @@ class RankedVote(BaseVote):
 
         ```
         """
-        counts = weighted_value_count(self._ranking, value=0, weight_col=self._count_col)
+        counts = self.plurality_counts()
         candidates, _ = find_max_in_mapping(counts)
         return tuple(sorted(candidates))
 
