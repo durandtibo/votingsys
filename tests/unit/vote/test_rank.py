@@ -41,14 +41,8 @@ def test_ranked_vote_str(ranking: pl.DataFrame) -> None:
     assert str(RankedVote(ranking)).startswith("RankedVote(")
 
 
-def test_ranked_vote_equal_true() -> None:
-    assert RankedVote(
-        pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 5, 2]})
-    ).equal(
-        RankedVote(
-            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 5, 2]})
-        )
-    )
+def test_ranked_vote_equal_true(ranking: pl.DataFrame) -> None:
+    assert RankedVote(ranking).equal(RankedVote(ranking))
 
 
 def test_ranked_vote_equal_false_different_ranking() -> None:
@@ -130,13 +124,31 @@ def test_ranked_vote_absolute_majority_winner_no_majority() -> None:
         ).absolute_majority_winner()
 
 
-def test_ranked_vote_borda_count_winner() -> None:
-    assert (
-        RankedVote(
-            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
-        ).borda_count_winner()
-        == "c"
+def test_ranked_vote_borda_counts(ranking: pl.DataFrame) -> None:
+    assert objects_are_equal(
+        RankedVote(ranking).borda_counts(),
+        {"a": 21.0, "b": 17.0, "c": 22.0},
     )
+
+
+def test_ranked_vote_borda_counts_custom_points(ranking: pl.DataFrame) -> None:
+    assert objects_are_equal(
+        RankedVote(ranking).borda_counts(points=[4, 2, 1]),
+        {"a": 24.0, "b": 19.0, "c": 27.0},
+    )
+
+
+def test_ranked_vote_borda_counts_incorrect_points(ranking: pl.DataFrame) -> None:
+    vote = RankedVote(ranking)
+    with pytest.raises(
+        ValueError,
+        match=r"The number of points \(2\) is different from the number of candidates \(3\)",
+    ):
+        vote.borda_counts(points=[4, 2])
+
+
+def test_ranked_vote_borda_count_winner(ranking: pl.DataFrame) -> None:
+    assert RankedVote(ranking).borda_count_winner() == "c"
 
 
 def test_ranked_vote_borda_count_winner_multiple() -> None:
@@ -153,19 +165,12 @@ def test_ranked_vote_borda_count_winner_one_candidate() -> None:
     assert RankedVote(pl.DataFrame({"a": [0], "count": [6]})).borda_count_winner() == "a"
 
 
-def test_ranked_vote_borda_count_winner_custom_points() -> None:
-    assert (
-        RankedVote(
-            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
-        ).borda_count_winner(points=[4, 2, 1])
-        == "c"
-    )
+def test_ranked_vote_borda_count_winner_custom_points(ranking: pl.DataFrame) -> None:
+    assert RankedVote(ranking).borda_count_winner(points=[4, 2, 1]) == "c"
 
 
-def test_ranked_vote_borda_count_winner_incorrect_points() -> None:
-    vote = RankedVote(
-        pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
-    )
+def test_ranked_vote_borda_count_winner_incorrect_points(ranking: pl.DataFrame) -> None:
+    vote = RankedVote(ranking)
     with pytest.raises(
         ValueError,
         match=r"The number of points \(2\) is different from the number of candidates \(3\)",
@@ -173,10 +178,8 @@ def test_ranked_vote_borda_count_winner_incorrect_points() -> None:
         vote.borda_count_winner(points=[4, 2])
 
 
-def test_ranked_vote_borda_count_winners() -> None:
-    assert RankedVote(
-        pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
-    ).borda_count_winners() == ("c",)
+def test_ranked_vote_borda_count_winners(ranking: pl.DataFrame) -> None:
+    assert RankedVote(ranking).borda_count_winners() == ("c",)
 
 
 def test_ranked_vote_borda_count_winners_multiple() -> None:
@@ -189,16 +192,12 @@ def test_ranked_vote_borda_count_winners_one_candidate() -> None:
     assert RankedVote(pl.DataFrame({"a": [0], "count": [6]})).borda_count_winners() == ("a",)
 
 
-def test_ranked_vote_borda_count_winners_custom_points() -> None:
-    assert RankedVote(
-        pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
-    ).borda_count_winners(points=[4, 2, 1]) == ("c",)
+def test_ranked_vote_borda_count_winners_custom_points(ranking: pl.DataFrame) -> None:
+    assert RankedVote(ranking).borda_count_winners(points=[4, 2, 1]) == ("c",)
 
 
-def test_ranked_vote_borda_count_winners_incorrect_points() -> None:
-    vote = RankedVote(
-        pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
-    )
+def test_ranked_vote_borda_count_winners_incorrect_points(ranking: pl.DataFrame) -> None:
+    vote = RankedVote(ranking)
     with pytest.raises(
         ValueError,
         match=r"The number of points \(2\) is different from the number of candidates \(3\)",
@@ -206,12 +205,10 @@ def test_ranked_vote_borda_count_winners_incorrect_points() -> None:
         vote.borda_count_winners(points=[4, 2])
 
 
-def test_ranked_vote_plurality_counts() -> None:
+def test_ranked_vote_plurality_counts(ranking: pl.DataFrame) -> None:
     assert objects_are_equal(
-        RankedVote(
-            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
-        ).plurality_counts(),
-        {"a": 3, "b": 2, "c": 6},
+        RankedVote(ranking).plurality_counts(),
+        {"a": 3, "b": 2, "c": 5},
     )
 
 
@@ -222,13 +219,8 @@ def test_ranked_vote_plurality_counts_one_candidate() -> None:
     )
 
 
-def test_ranked_vote_plurality_winner() -> None:
-    assert (
-        RankedVote(
-            pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
-        ).plurality_winner()
-        == "c"
-    )
+def test_ranked_vote_plurality_winner(ranking: pl.DataFrame) -> None:
+    assert RankedVote(ranking).plurality_winner() == "c"
 
 
 def test_ranked_vote_plurality_winner_tie() -> None:
@@ -247,10 +239,8 @@ def test_ranked_vote_plurality_winner_1_candidate() -> None:
     assert RankedVote(pl.DataFrame({"a": [0], "count": [6]})).plurality_winner() == "a"
 
 
-def test_ranked_vote_plurality_winners() -> None:
-    assert RankedVote(
-        pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 6, 2]})
-    ).plurality_winners() == ("c",)
+def test_ranked_vote_plurality_winners(ranking: pl.DataFrame) -> None:
+    assert RankedVote(ranking).plurality_winners() == ("c",)
 
 
 def test_ranked_vote_plurality_winners_multiple() -> None:
@@ -434,8 +424,20 @@ def test_candy_election_absolute_majority_winner(candy_election: pl.DataFrame) -
         RankedVote.from_dataframe_with_count(candy_election).absolute_majority_winner()
 
 
+def test_candy_election_borda_counts(candy_election: pl.DataFrame) -> None:
+    assert objects_are_equal(
+        RankedVote(candy_election).borda_counts(), {"C": 31.0, "M": 39.0, "S": 38.0}
+    )
+
+
 def test_candy_election_borda_count_winner(candy_election: pl.DataFrame) -> None:
     assert RankedVote(candy_election).borda_count_winner() == "M"
+
+
+def test_candy_election_plurality_counts(candy_election: pl.DataFrame) -> None:
+    assert objects_are_equal(
+        RankedVote(candy_election).plurality_counts(), {"C": 5, "M": 4, "S": 9}
+    )
 
 
 def test_candy_election_plurality_winner(candy_election: pl.DataFrame) -> None:

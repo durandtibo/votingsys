@@ -130,6 +130,48 @@ class RankedVote(BaseVote):
         msg = "No winner found using absolute majority rule"
         raise WinnerNotFoundError(msg)
 
+    def borda_counts(self, points: Sequence | None = None) -> dict[str, float]:
+        r"""Compute the Borda count for each candidate.
+
+        The Borda count method is a ranked voting system where voters
+        list candidates in order of preference. Points are assigned
+        based on position in each ranking. For example, in an election
+        with n candidates, a first-place vote earns n points, second
+        place gets n-1, and so on, down to 1. The candidate with the
+        highest total score across all votes wins. This method
+        considers the overall preferences of voters, not just their
+        top choices.
+
+        Args:
+            points: The points associated for each rank. The first value
+                is the point for rank 0, the second value is the point
+                for rank 1, etc. The number of points must be equal to
+                the number of candidates. If no points is given, the
+                default points are ``[n, n-1, n-2, ..., 1]``
+
+        Returns:
+            A dictionary with the Borda count for each candidate.
+                The key is the candidate and the value is the Borda
+                count.
+
+        Example usage:
+
+        ```pycon
+
+        >>> import polars as pl
+        >>> from votingsys.vote import RankedVote
+        >>> vote = RankedVote.from_dataframe_with_count(
+        ...     pl.DataFrame({"a": [0, 1, 2], "b": [1, 2, 0], "c": [2, 0, 1], "count": [3, 5, 2]}),
+        ... )
+        >>> vote.borda_counts()
+        {'a': 21.0, 'b': 17.0, 'c': 22.0}
+
+        ```
+        """
+        if points is None:
+            points = list(range(self.get_num_candidates(), 0, -1))
+        return compute_borda_count(self.ranking, points=points, count_col=self._count_col)
+
     def borda_count_winner(self, points: Sequence | None = None) -> str:
         r"""Compute the winner based on the Borda count rule.
 
@@ -218,10 +260,7 @@ class RankedVote(BaseVote):
 
         ```
         """
-        if points is None:
-            points = list(range(self.get_num_candidates() + 1, 1, -1))
-        counts = compute_borda_count(self.ranking, points=points, count_col=self._count_col)
-        candidates, _ = find_max_in_mapping(counts)
+        candidates, _ = find_max_in_mapping(self.borda_counts(points=points))
         return tuple(sorted(candidates))
 
     def plurality_counts(self) -> dict[str, int]:
@@ -313,8 +352,7 @@ class RankedVote(BaseVote):
 
         ```
         """
-        counts = self.plurality_counts()
-        candidates, _ = find_max_in_mapping(counts)
+        candidates, _ = find_max_in_mapping(self.plurality_counts())
         return tuple(sorted(candidates))
 
     @classmethod
