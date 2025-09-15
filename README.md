@@ -53,85 +53,83 @@
     <br/>
 </p>
 
-A python library implementing some voting systems.
+## Overview
 
-## Data representation
+A Python library that provides implementations of various voting systems.
+This library is designed to simulate the outcomes of elections using multiple voting methods.
+It enables users to compare how different voting systems may influence election results based on the
+same set of voter preferences or inputs.
 
-- anonymous
-- can have null values
-- can have the same ranking
+- [Motivation](#motivation)
+- [Documentation](https://durandtibo.github.io/votingsys/)
+- [Installation](#installation)
+- [Contributing](#contributing)
+- [API stability](#api-stability)
+- [License](#license)
 
-- Test with a lot of candidates
+## Motivation
 
-### DataFrame with the rank for each candidate
+## Documentation
 
-### DataFrame with the score for each candidate
+- [latest (stable)](https://durandtibo.github.io/votingsys/): documentation from the latest stable
+  release.
+- [main (unstable)](https://durandtibo.github.io/votingsys/main/): documentation associated to the
+  main branch of the repo. This documentation may contain a lot of work-in-progress/outdated/missing
+  parts.
 
-- descending vs ascending
+## Installation
 
-## Rule
+We highly recommend installing
+a [virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/).
+`votingsys` can be installed from pip using the following command:
 
-- voter ranks candidates
-- single vs multiple winners: https://en.wikipedia.org/wiki/Comparison_of_voting_rules
-- Ballot type:
-    - single mark
-    - ranking
-    - truncated ranking
-    - ranking with ties
-    - rating
-- approval and score voting: https://en.wikipedia.org/wiki/Approval_voting
-- approve or disapprove of candidates, or decide to express no opinion
-- Score each candidate by filling in a number (0 is worst; 9 is best)
-- Majority Rule: This concept means that the candidate (choice) receiving more than 50%
-  of the vote is the winner.
+```shell
+pip install votingsys
+```
 
-Raw Ranking
+To make the package as slim as possible, only the minimal packages required to use `votingsys` are
+installed.
+To include all the dependencies, you can use the following command:
 
-| rank_1 | rank_2 | rank_3 |
-|--------|--------|--------|
-| B      | A      | C      |
-| B      | A      | C      |
-| B      | A      | C      |
-| B      | A      | C      |
-| B      | A      | C      |
-| A      | B      | C      |
-| A      | B      | C      |
-| C      | B      | A      |
-| C      | B      | A      |
-| C      | B      | A      |
-| C      | B      | A      |
-| C      | B      | A      |
-| C      | B      | A      |
-| C      | B      | A      |
+```shell
+pip install votingsys[all]
+```
 
-Ranking
+Please check the [get started page](https://durandtibo.github.io/votingsys/get_started) to see how
+to install only some specific dependencies or other alternatives to install the library.
+The following is the corresponding `votingsys` versions and tested dependencies.
 
-| count | rank_1 | rank_2 | rank_3 |
-|-------|--------|--------|--------|
-| 5     | B      | A      | C      |
-| 2     | A      | B      | C      |
-| 7     | C      | B      | A      |
+| `votingsys` | `numpy`      | `polars`     | `python`      |
+|-------------|--------------|--------------|---------------|
+| `main`      | `>=2.0,<3.0` | `>=1.0,<2.0` | `>=3.9,<3.14` |
 
-Preference
+<sup>*</sup> indicates an optional dependency
 
-| count | A | B | C |
-|-------|---|---|---|
-| 5     | 1 | 0 | 2 |
-| 2     | 0 | 1 | 2 |
-| 7     | 2 | 1 | 0 |
+<details>
+    <summary>older versions</summary>
 
-Preference with ties
+</details>
 
-| count | A | B | C |
-|-------|---|---|---|
-| 5     | 1 | 0 | 1 |
-| 2     | 0 | 1 | 2 |
-| 7     | 0 | 1 | 0 |
+## Contributing
 
-Truncated/partial Preference
+Please check the instructions in [CONTRIBUTING.md](.github/CONTRIBUTING.md).
 
-| count | A | B | C | D |
-|-------|---|---|---|---|
-| 5     | 1 | 0 |   | 2 |
-| 2     | 0 |   | 2 | 1 |
-| 7     | 2 | 1 | 0 |   |
+## Suggestions and Communication
+
+Everyone is welcome to contribute to the community.
+If you have any questions or suggestions, you can
+submit [Github Issues](https://github.com/durandtibo/votingsys/issues).
+We will reply to you as soon as possible. Thank you very much.
+
+## API stability
+
+:warning: While `votingsys` is in development stage, no API is guaranteed to be stable from one
+release to the next.
+In fact, it is very likely that the API will change multiple times before a stable 1.0.0 release.
+In practice, this means that upgrading `votingsys` to a new version will possibly break any code
+that was using the old version of `votingsys`.
+
+## License
+
+`votingsys` is licensed under BSD 3-Clause "New" or "Revised" license available
+in [LICENSE](LICENSE) file.
