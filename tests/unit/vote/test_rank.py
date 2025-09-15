@@ -9,7 +9,7 @@ from votingsys.vote import (
     RankedVote,
     WinnerNotFoundError,
 )
-from votingsys.vote.rank import compute_borda_count
+from votingsys.vote.rank import compute_borda_count, support
 
 ################################
 #     Tests for RankedVote     #
@@ -386,6 +386,54 @@ def test_compute_borda_count_too_many_points(ranking: pl.DataFrame) -> None:
         compute_borda_count(ranking, points=[3, 2, 1, 0.5], count_col="count")
 
 
+#############################
+#     Tests for support     #
+#############################
+
+
+def test_support_aa(ranking: pl.DataFrame) -> None:
+    assert support(ranking, count_col="count", c1="a", c2="a") == 0
+
+
+def test_support_ab(ranking: pl.DataFrame) -> None:
+    assert support(ranking, count_col="count", c1="a", c2="b") == 6
+
+
+def test_support_ac(ranking: pl.DataFrame) -> None:
+    assert support(ranking, count_col="count", c1="a", c2="c") == -4
+
+
+def test_support_ba(ranking: pl.DataFrame) -> None:
+    assert support(ranking, count_col="count", c1="b", c2="a") == -6
+
+
+def test_support_bb(ranking: pl.DataFrame) -> None:
+    assert support(ranking, count_col="count", c1="b", c2="b") == 0
+
+
+def test_support_bc(ranking: pl.DataFrame) -> None:
+    assert support(ranking, count_col="count", c1="b", c2="c") == 0
+
+
+def test_support_ca(ranking: pl.DataFrame) -> None:
+    assert support(ranking, count_col="count", c1="c", c2="a") == 4
+
+
+def test_support_cb(ranking: pl.DataFrame) -> None:
+    assert support(ranking, count_col="count", c1="c", c2="b") == 0
+
+
+def test_support_cc(ranking: pl.DataFrame) -> None:
+    assert support(ranking, count_col="count", c1="c", c2="c") == 0
+
+
+def test_support_opposite(ranking: pl.DataFrame) -> None:
+    assert objects_are_equal(
+        support(ranking, count_col="count", c1="a", c2="c"),
+        -support(ranking, count_col="count", c1="c", c2="a"),
+    )
+
+
 ###################################################################################################
 # Candy election example
 # https://coconino.edu/resources/files/pdfs/academics/arts-and-sciences/MAT142/Chapter_7_VotingSystems.pdf
@@ -430,7 +478,10 @@ def test_candy_election_absolute_majority_winner(candy_election: pl.DataFrame) -
 
 def test_candy_election_borda_counts(candy_election: pl.DataFrame) -> None:
     assert objects_are_equal(
-        RankedVote(candy_election).borda_counts(), {"C": 31.0, "M": 39.0, "S": 38.0}
+        RankedVote(candy_election).borda_counts([3, 2, 1]), {"C": 31.0, "M": 39.0, "S": 38.0}
+    )
+    assert objects_are_equal(
+        RankedVote(candy_election).borda_counts([2, 1, 0]), {"C": 13.0, "M": 21.0, "S": 20.0}
     )
 
 
