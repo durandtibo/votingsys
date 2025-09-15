@@ -6,6 +6,7 @@ __all__ = ["RankedVote", "compute_borda_count"]
 
 from typing import TYPE_CHECKING, Any
 
+import polars as pl
 from black.trans import defaultdict
 from coola import objects_are_equal
 
@@ -25,8 +26,6 @@ from votingsys.vote.base import (
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-
-    import polars as pl
 
 
 class RankedVote(BaseVote):
@@ -376,6 +375,15 @@ class RankedVote(BaseVote):
         candidates, _ = find_max_in_mapping(self.plurality_counts())
         return tuple(sorted(candidates))
 
+    def margin(self, c1: str, c2: str) -> int:
+        r"""Compute the number of voters that rank ``c1`` above ``c2``
+        minus the number of voters that rank ``c2`` above ``c1``.
+
+        Args:
+            c1: The first candidate.
+            c2: The second candidate.
+        """
+
     @classmethod
     def from_dataframe(cls, ranking: pl.DataFrame, count_col: str = "count") -> RankedVote:
         r"""Instantiate a ``RankedVote`` object from a
@@ -549,3 +557,21 @@ def compute_borda_count(
         for key, val in counts.items():
             total[key] += val * point
     return dict(total)
+
+
+def support(ranking: pl.DataFrame, count_col: str, c1: str, c2: str) -> int:
+    r"""The number of voters that rank ``c1`` above ``c2``.
+
+    Args:
+        ranking: A DataFrame with the ranking for each voter. Each
+            column represents a candidate, and each row is a voter
+            ranking. The ranking goes from ``0`` to ``n-1``, where
+            ``n`` is the number of candidates. One column contains
+            the number of voters for this ranking.
+        count_col: The column with the count data for each ranking.
+        c1: The first candidate.
+        c2: The second candidate.
+
+    Returns:
+    """
+    return ranking.select(((pl.col(c1) - pl.col(c2)).clip(0, 1) * pl.col(count_col)).sum()).item()
