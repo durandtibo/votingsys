@@ -96,6 +96,10 @@ def show_python_config(c: Context) -> None:
 def publish_pypi(c: Context) -> None:
     r"""Publish the package to PyPI."""
     c.run("uv build", pty=True)
+    c.run(
+        'uv run --with votingsys --refresh-package votingsys --no-project -- python -c "import votingsys"',
+        pty=True,
+    )
     c.run("uv publish --token ${PYPI_TOKEN}", pty=True)
 
 
