@@ -63,7 +63,9 @@ This format makes it easy to compare how each candidate was ranked across voters
 
 ## Comparison
 
-| Task or Analysis                            | Recommended Format          |
+Choosing the right tabular format for ranked voting data depends on the task.
+
+| Task                                        | Recommended Format          |
 |---------------------------------------------|-----------------------------|
 | Implementing ranked-choice voting rules     | Ranking position as columns |
 | Counting first-choice votes                 | Ranking position as columns |
