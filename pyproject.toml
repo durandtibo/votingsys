@@ -60,9 +60,6 @@ docs = [
 requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
-[tool.hatch.version]
-version = { attr = "votingsys.__version__" }
-
 [tool.uv.pip]
 torch-backend = "auto"
 
