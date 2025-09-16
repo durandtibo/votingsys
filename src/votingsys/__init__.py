@@ -1,8 +1,8 @@
 r"""Root package."""
 
-# import importlib.metadata
-#
-# try:
-#     __version__ = importlib.metadata.version(__name__)
-# except importlib.metadata.PackageNotFoundError:
-#     __version__ = "0.0.0-dev"
+from importlib.metadata import PackageNotFoundError, version
+
+try:
+    __version__ = version(__name__)
+except PackageNotFoundError:  # pragma: no cover
+    __version__ = "0.0.0-dev"
