@@ -93,6 +93,17 @@ def show_python_config(c: Context) -> None:
 
 
 @task
+def publish_pypi(c: Context) -> None:
+    r"""Publish the package to PyPI."""
+    c.run("uv build", pty=True)
+    c.run(
+        f'uv run --with {NAME} --refresh-package {NAME} --no-project -- python -c "import {NAME}"',
+        pty=True,
+    )
+    c.run("uv publish --token ${PYPI_TOKEN}", pty=True)
+
+
+@task
 def publish_doc_dev(c: Context) -> None:
     r"""Publish development (e.g. unstable) docs."""
     # delete previous version if it exists
