@@ -99,9 +99,9 @@ Please check the [get started page](https://durandtibo.github.io/votingsys/get_s
 to install only some specific dependencies or other alternatives to install the library.
 The following is the corresponding `votingsys` versions and tested dependencies.
 
-| `votingsys` | `numpy`      | `polars`     | `python`      |
-|-------------|--------------|--------------|---------------|
-| `main`      | `>=2.0,<3.0` | `>=1.0,<2.0` | `>=3.9,<3.14` |
+| `votingsys` | `numpy`      | `polars`     | `python`       |
+|-------------|--------------|--------------|----------------|
+| `main`      | `>=2.0,<3.0` | `>=1.0,<2.0` | `>=3.10,<3.15` |
 
 <sup>*</sup> indicates an optional dependency
 
