@@ -14,6 +14,7 @@ SOURCE = f"src/{NAME}"
 TESTS = "tests"
 UNIT_TESTS = f"{TESTS}/unit"
 INTEGRATION_TESTS = f"{TESTS}/integration"
+PYTHON_VERSION = "3.13"
 
 
 @task
@@ -31,7 +32,7 @@ def check_lint(c: Context) -> None:
 @task
 def create_venv(c: Context) -> None:
     r"""Create a virtual environment."""
-    c.run("uv venv", pty=True)
+    c.run(f"uv venv --python {PYTHON_VERSION} --clear", pty=True)
     c.run("source .venv/bin/activate", pty=True)
     c.run("make install-invoke", pty=True)
 
@@ -45,6 +46,12 @@ def doctest_src(c: Context) -> None:
         "-o ELLIPSIS -o REPORT_NDIFF",
         pty=True,
     )
+
+
+@task
+def docformat(c: Context) -> None:
+    r"""Check the docstrings in source folder."""
+    c.run(f"docformatter --config ./pyproject.toml --in-place {SOURCE}", pty=True)
 
 
 @task
@@ -68,12 +75,34 @@ def update(c: Context) -> None:
 
 
 @task
+def all_test(c: Context, cov: bool = False) -> None:
+    r"""Run the unit tests."""
+    cmd = ["python -m pytest --xdoctest --timeout 10"]
+    if cov:
+        cmd.append(f"--cov-report html --cov-report xml --cov-report term --cov={NAME}")
+    cmd.append(f"{TESTS}")
+    c.run(" ".join(cmd), pty=True)
+
+
+@task
 def unit_test(c: Context, cov: bool = False) -> None:
     r"""Run the unit tests."""
     cmd = ["python -m pytest --xdoctest --timeout 10"]
     if cov:
         cmd.append(f"--cov-report html --cov-report xml --cov-report term --cov={NAME}")
     cmd.append(f"{UNIT_TESTS}")
+    c.run(" ".join(cmd), pty=True)
+
+
+@task
+def integration_test(c: Context, cov: bool = False) -> None:
+    r"""Run the unit tests."""
+    cmd = ["python -m pytest --xdoctest --timeout 60"]
+    if cov:
+        cmd.append(
+            f"--cov-report html --cov-report xml --cov-report term  --cov-append --cov={NAME}"
+        )
+    cmd.append(f"{INTEGRATION_TESTS}")
     c.run(" ".join(cmd), pty=True)
 
 
