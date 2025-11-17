@@ -40,6 +40,14 @@ unit-test :
 unit-test-cov :
 	inv unit-test --cov
 
+.PHONY : integration-test
+integration-test :
+	inv integration-test
+
+.PHONY : integration-test-cov
+integration-test-cov :
+	inv integration-test --cov
+
 .PHONY : publish-pypi
 publish-pypi :
 	inv publish-pypi
