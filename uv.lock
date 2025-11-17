@@ -350,15 +350,15 @@ wheels = [
 
 [[package]]
 name = "feu"
-version = "0.5.0"
+version = "0.5.1a0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "packaging" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4f/b5/f6e3673ed287e731f76ede7f779c0f5510b270492ee2dd1a06d9902da542/feu-0.5.0.tar.gz", hash = "sha256:89e8b458dcf65a0cbe2dde14e96a68047b0431a6712e63b02e3bcaf87c258517", size = 21765, upload-time = "2025-11-09T23:50:16.344Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7f/65/cfec05ab7b049711a5ae13020e602c51b4369746ef37be103cc68d8eb1f7/feu-0.5.1a0.tar.gz", hash = "sha256:0f41593d54cabed9ac569af1d6147816f550f7d8001cf5bb8f9885bd44103b19", size = 22313, upload-time = "2025-11-17T08:24:06.445Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/db/88/ff9e3eba1c116a3d24a47d359c245f4b97115db4cec0d6a8eb5b4ebab711/feu-0.5.0-py3-none-any.whl", hash = "sha256:663b539638f3c074a078bb26d918627c1fa3444d9a06730ff11ce987b7218618", size = 27549, upload-time = "2025-11-09T23:50:15.085Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/7c/4043907b6a77379804a872116c4bc07f649c34e58d447b4462c456fb8ca0/feu-0.5.1a0-py3-none-any.whl", hash = "sha256:b57b17c07518b998a8eb35bf1f40312492319dabb25745a5415b3a9c96a6a2f6", size = 28154, upload-time = "2025-11-17T08:24:05.046Z" },
 ]
 
 [package.optional-dependencies]
@@ -1286,7 +1286,7 @@ wheels = [
 
 [[package]]
 name = "votingsys"
-version = "0.0.1a0"
+version = "0.0.1a1"
 source = { editable = "." }
 dependencies = [
     { name = "coola" },
@@ -1328,7 +1328,7 @@ dev = [
     { name = "black", specifier = ">=25.11" },
     { name = "coverage", extras = ["toml"], specifier = ">=7.11,<8.0" },
     { name = "docformatter", extras = ["tomli"], marker = "python_full_version < '3.14'", specifier = ">=1.7,<2.0" },
-    { name = "feu", extras = ["all"], specifier = ">=0.5.0,<1.0" },
+    { name = "feu", extras = ["all"], specifier = ">=0.5.1a0,<1.0" },
     { name = "invoke", specifier = ">=2.2.0,<3.0" },
     { name = "pre-commit", specifier = ">=4.4,<5.0" },
     { name = "pygments", specifier = ">=2.19,<3.0" },
