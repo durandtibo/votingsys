@@ -9,8 +9,11 @@ from pathlib import Path
 from feu.utils.io import save_json
 from feu.version import (
     filter_every_n_versions,
+    filter_last_n_versions,
     get_latest_minor_versions,
     get_versions,
+    sort_versions,
+    unique_versions,
 )
 
 logger = logging.getLogger(__name__)
@@ -24,7 +27,12 @@ def get_package_versions() -> dict[str, list[str]]:
     """
     return {
         "coola": list(get_versions("coola", lower="0.9.1")),
-        "polars": filter_every_n_versions(get_latest_minor_versions("polars", lower="1.0"), n=5),
+        "polars": sort_versions(
+            unique_versions(
+                filter_every_n_versions(get_latest_minor_versions("polars", lower="1.0"), n=5)
+                + filter_last_n_versions(get_latest_minor_versions("polars", lower="1.0"), n=1)
+            )
+        ),
         "numpy": list(get_latest_minor_versions("numpy", lower="2.0")),
     }
 
