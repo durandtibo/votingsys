@@ -12,17 +12,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@v5
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: '3.12'
+          activate-environment: true
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+      - name: Install invoke
+        run: |
+          make install-invoke
 
       - name: Publish
         env:
