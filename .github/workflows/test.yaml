@@ -74,7 +74,7 @@ jobs:
         uses: ./.github/actions/setup-env
         with:
           python-version: ${{ matrix.python-version }}
-          install-optional-deps: false
+          install-args: '--no-optional-deps'
 
       - name: Run unit tests
         run: |
