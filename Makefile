@@ -6,11 +6,11 @@ conda :
 
 .PHONY : install
 install :
-	inv install
+	inv install --no-optional-deps
 
 .PHONY : install-all
 install-all :
-	inv install --all-deps --docs
+	inv install --docs-deps
 
 .PHONY : update
 update :
@@ -66,7 +66,7 @@ setup-venv :
 	uv venv --python 3.13 --clear
 	$(MAKE) install-invoke
 	.venv/bin/inv create-venv
-	.venv/bin/inv install --all-deps
+	.venv/bin/inv install --docs-deps
 
 .PHONY : install-invoke
 install-invoke :
