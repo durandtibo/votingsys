@@ -4,9 +4,9 @@ from __future__ import annotations
 
 __all__ = ["RankedVote", "compute_borda_count"]
 
+from collections import defaultdict
 from typing import TYPE_CHECKING, Any
 
-from black.trans import defaultdict
 from coola import objects_are_equal
 
 from votingsys.data.aggregation import compute_count_aggregated_dataframe
