@@ -49,7 +49,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "black >=25.11",
-    "coverage[toml] >=7.11,<8.0",
+    "coverage[toml] >=7.12,<8.0",
     "docformatter[tomli] >=1.7,<2.0 ; python_version < '3.14'",
     "feu[all] >=0.5.1a0,<1.0",
     "invoke >=2.2.0,<3.0",
