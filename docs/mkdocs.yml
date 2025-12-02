@@ -19,6 +19,7 @@ theme:
 nav:
   - Home: index.md
   - Data: data_representation.md
+  - Resources: resources.md
   - Reference:
       - refs/utils.md
       - refs/vote.md
