@@ -4,13 +4,13 @@ from __future__ import annotations
 
 __all__ = ["check_non_empty_count", "check_non_negative_count"]
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections import Counter
 
 
-def check_non_empty_count(counter: Counter) -> None:
+def check_non_empty_count(counter: Counter[Any]) -> None:
     r"""Check if the counter is not empty.
 
     Args:
@@ -34,7 +34,7 @@ def check_non_empty_count(counter: Counter) -> None:
         raise ValueError(msg)
 
 
-def check_non_negative_count(counter: Counter) -> None:
+def check_non_negative_count(counter: Counter[Any]) -> None:
     r"""Check if all the count values are non-negative (>=0).
 
     Args:
