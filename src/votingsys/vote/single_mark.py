@@ -52,7 +52,7 @@ class SingleMarkVote(BaseVote):
     ```
     """
 
-    def __init__(self, counter: Counter) -> None:
+    def __init__(self, counter: Counter[str]) -> None:
         check_non_negative_count(counter)
         check_non_empty_count(counter)
         self._counter = counter

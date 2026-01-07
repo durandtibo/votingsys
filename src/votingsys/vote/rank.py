@@ -151,7 +151,7 @@ class RankedVote(BaseVote):
         msg = "No winner found using absolute majority rule"
         raise WinnerNotFoundError(msg)
 
-    def borda_counts(self, points: Sequence | None = None) -> dict[str, float]:
+    def borda_counts(self, points: Sequence[float] | None = None) -> dict[str, float]:
         r"""Compute the Borda count for each candidate.
 
         The Borda count method is a ranked voting system where voters
@@ -190,10 +190,10 @@ class RankedVote(BaseVote):
         ```
         """
         if points is None:
-            points = list(range(self.get_num_candidates(), 0, -1))
+            points = list(map(float, range(self.get_num_candidates(), 0, -1)))
         return compute_borda_count(self.ranking, points=points, count_col=self._count_col)
 
-    def borda_count_winner(self, points: Sequence | None = None) -> str:
+    def borda_count_winner(self, points: Sequence[float] | None = None) -> str:
         r"""Compute the winner based on the Borda count rule.
 
         The Borda count method is a ranked voting system where voters
@@ -238,7 +238,7 @@ class RankedVote(BaseVote):
             raise MultipleWinnersFoundError(msg)
         return winners[0]
 
-    def borda_count_winners(self, points: Sequence | None = None) -> tuple[str, ...]:
+    def borda_count_winners(self, points: Sequence[float] | None = None) -> tuple[str, ...]:
         r"""Compute the winner(s) based on the Borda count rule.
 
         The Borda count method is a ranked voting system where voters
