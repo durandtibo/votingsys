@@ -4,7 +4,7 @@ from collections import Counter
 
 import polars as pl
 import pytest
-from coola import objects_are_equal
+from coola.equality import objects_are_equal
 
 from votingsys.vote import (
     MultipleWinnersFoundError,

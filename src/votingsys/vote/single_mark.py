@@ -7,7 +7,7 @@ __all__ = ["SingleMarkVote"]
 from collections import Counter
 from typing import TYPE_CHECKING, Any
 
-from coola import objects_are_equal
+from coola.equality import objects_are_equal
 from coola.utils.format import repr_indent, repr_mapping
 
 from votingsys.utils.counter import check_non_empty_count, check_non_negative_count

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import polars as pl
 import pytest
-from coola import objects_are_equal
+from coola.equality import objects_are_equal
 
 from votingsys.utils.dataframe import (
     check_column_exist,
