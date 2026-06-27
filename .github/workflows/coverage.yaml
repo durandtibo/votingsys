@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup python environment
         uses: durandtibo/setup-venv-uv-action@v0.0.3
@@ -27,7 +27,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: github.repository == 'durandtibo/votingsys' && (github.event_name == 'push' || github.event_name == 'pull_request')
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
